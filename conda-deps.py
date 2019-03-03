@@ -51,6 +51,7 @@ import importlib.util
 import re
 import ast
 import argparse
+import json
 
 
 def is_import(node):
@@ -176,6 +177,7 @@ def print_conda_env(deps, envname="myenv",
     for d in deps:
         print(" - {}".format(d))
 
+
 def main(argv=None):
     """script main.
     parses command line options in sys.argv, unless *argv* is given.
@@ -194,6 +196,11 @@ def main(argv=None):
     parser.add_argument("filename", help="Path to Python file")
 
     options = parser.parse_args()
+
+    # load translations for Python deps
+    pydeps = json.load(open('{}/python-deps.yml'.format(os.path.split(__file__)[0])))
+    for k in pydeps:
+        print("{}: {}".format(k, pydeps[k]))
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename)
