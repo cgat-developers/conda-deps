@@ -32,7 +32,7 @@ The result will be a yaml file like:
 Usage
 -----
 
-.. python conda-deps.py --file  </path/to/file.py> [--print-summary]
+.. python conda-deps.py </path/to/file.py>
 
 References
 ----------
