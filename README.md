@@ -1,5 +1,7 @@
 # Purpose
 
+**Warning: This is work in progress, and must be used yet**
+
 The goal of this script is to generate a conda yaml environment file
 as a result of the dependencies found in source code. Initially, this 
 script will scan Python code only, but it would be great to have it 
