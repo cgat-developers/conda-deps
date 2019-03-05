@@ -1,6 +1,6 @@
 # Purpose
 
-**Warning: This is work in progress, and must be used yet**
+**Warning: This is work in progress, and not must be used yet**
 
 The goal of this script is to generate a conda yaml environment file
 as a result of the dependencies found in source code. Initially, this 
