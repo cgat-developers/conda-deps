@@ -57,6 +57,7 @@ import json
 PY_DEPS = json.load(
     open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
 
+
 def is_import(node):
     '''
        Auxiliary function to get import statements from
