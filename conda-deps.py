@@ -53,6 +53,9 @@ import ast
 import argparse
 import json
 
+# load translations for Python deps
+PY_DEPS = json.load(
+    open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
 
 def is_import(node):
     '''
@@ -139,7 +142,7 @@ def check_python_deps(filename):
     if os.path.isdir(filename):
         raise IOError("The given input is a folder, and must be a file\n")
 
-    # parse pipeline script with Python's AST module:
+    # parse script with Python's AST module:
     # https://docs.python.org/3/library/ast.html#module-ast
     with open(filename) as f:
         tree = ast.parse(f.read())
@@ -197,12 +200,6 @@ def main(argv=None):
     parser.add_argument("filename", help="Path to Python file")
 
     options = parser.parse_args()
-
-    # load translations for Python deps
-    pydeps = json.load(
-        open('{}/python-deps.yml'.format(os.path.split(__file__)[0])))
-    # for k in pydeps:
-    #    print("{}: {}".format(k, pydeps[k]))
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename)
