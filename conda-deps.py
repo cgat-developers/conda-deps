@@ -102,8 +102,7 @@ def is_python_std(name):
  
     if module_path is not None:
         result = not 'site-packages' in module_path or \
-                 python_path in module_path or \
-                 not imp.is_builtin(my_mod_name)
+                 python_path in module_path
 
     return result
 
@@ -191,7 +190,8 @@ def main(argv=None):
         argv = sys.argv
 
     # setup command line parser
-    parser = argparse.ArgumentParser(description='Get 3rd party dependencies.')
+    parser = argparse.ArgumentParser(
+        description='Translate Python dependencies into a conda environment file.')
 
     parser.add_argument("filename", help="Path to Python file")
 
@@ -199,8 +199,8 @@ def main(argv=None):
 
     # load translations for Python deps
     pydeps = json.load(open('{}/python-deps.yml'.format(os.path.split(__file__)[0])))
-    for k in pydeps:
-        print("{}: {}".format(k, pydeps[k]))
+    #for k in pydeps:
+    #    print("{}: {}".format(k, pydeps[k]))
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename)
