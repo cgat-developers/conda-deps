@@ -63,7 +63,7 @@ def is_import(node):
        a .py file
     '''
 
-    result = ""
+    result = None
 
     if isinstance(node, ast.Import) and \
             hasattr(node, 'names') and \
@@ -124,11 +124,18 @@ def translate_import(name):
     '''
        Auxiliary function to translate the module name
        into its conda package (e.g. cgat -> cgat-apps)
+
+       The translation assumes that by default a package
+       will be named the same as its import (e.g. numpy).
+       When that's not the case, we convert it using the
+       translation detailed in the file "python-deps.json"
+
+       python-deps.json will be growing over time as
+       we find more cases where the package name and the
+       import name differs
     '''
 
-    result = name
-
-    # TODO
+    result = PY_DEPS.get(name, name)
 
     return result
 
@@ -155,9 +162,12 @@ def check_python_deps(filename):
     # really helpful, used astviewer (installed in a conda-env) to inspect examples
     # https://github.com/titusjan/astviewer
     for node in ast.walk(tree):
-        aux = is_import(node)
-        if len(aux) > 0 and not is_python_std(aux):
-            deps.add(cleanup_import(aux))
+        module = is_import(node)
+        if module is not None and not is_python_std(module):
+            module = cleanup_import(module)
+            module = translate_import(module)
+            if module != "ignore":
+                deps.add(module)
 
     return deps
 
