@@ -6,11 +6,11 @@ Purpose
 -------
 
 .. The goal of this script is to generate a conda yaml environment file
-as a result of the dependencies found in source code. Initially, this 
-script will scan Python code only, but it would be great to have it 
+as a result of the dependencies found in source code. Initially, this
+script will scan Python code only, but it would be great to have it
 working for other programming languages as well.
 
-This script takes the path to a Python script, which contains import 
+This script takes the path to a Python script, which contains import
 statements like:
 
     import numpy
@@ -19,7 +19,7 @@ statements like:
 The result will be a yaml file like:
 
     name: testenv
-    
+
     channels:
     - conda-forge
     - bioconda
@@ -62,13 +62,13 @@ def is_import(node):
 
     result = ""
 
-    if type(node) is ast.Import and \
-        hasattr(node, 'names') and \
-        hasattr(node.names[0], 'name'):
+    if isinstance(node, ast.Import) and \
+            hasattr(node, 'names') and \
+            hasattr(node.names[0], 'name'):
         result = node.names[0].name
 
-    elif type(node) is ast.ImportFrom and \
-          hasattr(node, 'module'):
+    elif isinstance(node, ast.ImportFrom) and \
+            hasattr(node, 'module'):
         result = node.module
 
     return result
@@ -91,18 +91,18 @@ def is_python_std(name):
     python_path = os.path.dirname(sys.executable)
     module_path = None
 
-    try: 
+    try:
         module_path = importlib.util.find_spec(name).origin
-    except:
+    except BaseException:
         pass
-    
+
     #print(">>>> {}".format(name))
     #print(">>>> {}".format(python_path))
     #print(">>>> {}".format(module_path))
- 
+
     if module_path is not None:
-        result = not 'site-packages' in module_path or \
-                 python_path in module_path
+        result = 'site-packages' not in module_path or \
+            python_path in module_path
 
     return result
 
@@ -113,7 +113,7 @@ def cleanup_import(name):
        from import statements (e.g. matplotlib.pyplot -> matplotlib)
     '''
 
-    result = re.match("(\w+)(\S*)", name)
+    result = re.match(r"(\w+)(\S*)", name)
     return result.group(1)
 
 
@@ -125,9 +125,10 @@ def translate_import(name):
 
     result = name
 
-    ## TODO
+    # TODO
 
     return result
+
 
 def check_python_deps(filename):
 
@@ -163,7 +164,7 @@ def print_conda_env(deps, envname="myenv",
     '''
        Print conda environment file
     '''
-    
+
     if len(deps) == 0:
         print("\nNo dependencies found.\n")
         return
@@ -198,8 +199,9 @@ def main(argv=None):
     options = parser.parse_args()
 
     # load translations for Python deps
-    pydeps = json.load(open('{}/python-deps.yml'.format(os.path.split(__file__)[0])))
-    #for k in pydeps:
+    pydeps = json.load(
+        open('{}/python-deps.yml'.format(os.path.split(__file__)[0])))
+    # for k in pydeps:
     #    print("{}: {}".format(k, pydeps[k]))
 
     # get dependencies dependencies
@@ -207,6 +209,7 @@ def main(argv=None):
 
     # print info about dependencies
     print_conda_env(deps)
+
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))
