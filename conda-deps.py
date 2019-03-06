@@ -52,11 +52,20 @@ import re
 import ast
 import argparse
 import json
+import logging
 
 # load translations for Python deps
 PY_DEPS = json.load(
     open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
 
+# https://realpython.com/python-logging/
+# https://bit.ly/2VHKM44
+logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+rootLogger = logging.getLogger()
+rootLogger.setLevel(logging.INFO)
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logFormatter)
+rootLogger.addHandler(consoleHandler)
 
 def is_import(node):
     '''
@@ -88,6 +97,7 @@ def is_python_std(name):
     '''
 
     if name == 'sys':
+        logging.debug('sys is part of Python Standard Library')
         return True
 
     result = False
@@ -100,13 +110,15 @@ def is_python_std(name):
     except BaseException:
         pass
 
-    #print(">>>> {}".format(name))
-    #print(">>>> {}".format(python_path))
-    #print(">>>> {}".format(module_path))
+    logging.debug('Module Name: {}'.format(name))
+    logging.debug('Python Path: {}'.format(python_path))
+    logging.debug('Module Path: {}'.format(module_path))
 
     if module_path is not None:
         result = 'site-packages' not in module_path or \
             python_path in module_path
+
+    logging.debug('Is {} part of Python Standard Library? {}'.format(name, result))
 
     return result
 
@@ -209,8 +221,15 @@ def main(argv=None):
         description='Translate Python dependencies into a conda environment file.')
 
     parser.add_argument("filename", help="Path to Python file")
+    parser.add_argument("--debug",
+            help="Print debugging info",
+            action="store_true",
+            default=False)
 
     options = parser.parse_args()
+
+    if options.debug:
+        rootLogger.setLevel(logging.DEBUG)
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename)
