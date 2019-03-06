@@ -60,12 +60,14 @@ PY_DEPS = json.load(
 
 # https://realpython.com/python-logging/
 # https://bit.ly/2VHKM44
-logFormatter = logging.Formatter("%(asctime)s [%(levelname)-5.5s]  %(message)s")
+logFormatter = logging.Formatter(
+    "%(asctime)s [%(levelname)-5.5s]  %(message)s")
 rootLogger = logging.getLogger()
 rootLogger.setLevel(logging.INFO)
 consoleHandler = logging.StreamHandler()
 consoleHandler.setFormatter(logFormatter)
 rootLogger.addHandler(consoleHandler)
+
 
 def is_import(node):
     '''
@@ -118,7 +120,9 @@ def is_python_std(name):
         result = 'site-packages' not in module_path or \
             python_path in module_path
 
-    logging.debug('Is {} part of Python Standard Library? {}'.format(name, result))
+    logging.debug(
+        'Is {} part of Python Standard Library? {}'.format(
+            name, result))
 
     return result
 
@@ -222,9 +226,9 @@ def main(argv=None):
 
     parser.add_argument("filename", help="Path to Python file")
     parser.add_argument("--debug",
-            help="Print debugging info",
-            action="store_true",
-            default=False)
+                        help="Print debugging info",
+                        action="store_true",
+                        default=False)
 
     options = parser.parse_args()
 
