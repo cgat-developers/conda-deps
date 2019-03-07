@@ -54,6 +54,10 @@ import argparse
 import json
 import logging
 
+PY_STD = {'sys',
+          'builtins',
+          'xml'}
+
 # load translations for Python deps
 PY_DEPS = json.load(
     open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
@@ -105,8 +109,8 @@ def is_python_std(name):
        of Python's standard library or not
     '''
 
-    if name == 'sys':
-        logging.debug('sys is part of Python Standard Library')
+    if name in PY_STD:
+        logging.debug('{} is part of Python Standard Library'.format(name))
         return True
 
     result = False
@@ -164,14 +168,15 @@ def translate_import(name):
     return result
 
 
-def check_python_deps(filename):
-
+def scan_imports(filename):
+    '''
+       Auxiliary function to get imports from a single file
+    '''
     # check input is correct
     if not os.access(filename, os.R_OK):
-        raise IOError("File {} was not found\n".format(filename))
+        raise IOError("File {} can't be read\n".format(filename))
 
-    if os.path.isdir(filename):
-        raise IOError("The given input is a folder, and must be a file\n")
+    logging.debug('Scaning file: {}'.format(filename))
 
     # parse script with Python's AST module:
     # https://docs.python.org/3/library/ast.html#module-ast
@@ -194,6 +199,40 @@ def check_python_deps(filename):
                 deps.add(module)
 
     return deps
+
+
+def check_python_deps(filename):
+    '''
+       Auxiliary function to detect whether input is a file or a folder
+       and operate accordingly
+    '''
+
+    # check input is correct
+    if not os.access(filename, os.R_OK):
+        raise IOError("File {} can't be read\n".format(filename))
+
+    # list of files to scan
+    scan_this = []
+
+    if os.path.isdir(filename):
+        # scan all python files in the folder
+        for dirpath, dirs, files in os.walk(filename):
+            for f in files:
+                if f.endswith(".py"):
+                    scan_this.append(os.path.join(dirpath, f))
+    else:
+        # case of single file
+        scan_this.append(filename)
+
+    # set of dependencies
+    all_deps = set()
+
+    # scan all files
+    for f in scan_this:
+        deps = scan_imports(f)
+        all_deps.update(deps)
+
+    return all_deps
 
 
 def print_conda_env(deps, envname="myenv",
