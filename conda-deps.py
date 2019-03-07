@@ -58,16 +58,21 @@ import logging
 PY_DEPS = json.load(
     open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
 
-# https://realpython.com/python-logging/
-# https://bit.ly/2VHKM44
-logFormatter = logging.Formatter(
-    "%(asctime)s [%(levelname)-5.5s]  %(message)s")
-rootLogger = logging.getLogger()
-rootLogger.setLevel(logging.INFO)
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logFormatter)
-rootLogger.addHandler(consoleHandler)
-
+def config_logging(debug):
+    '''
+       Auxiliary function to configure logging
+    '''
+    # https://realpython.com/python-logging/
+    # https://bit.ly/2VHKM44
+    logFormatter = logging.Formatter(
+        "%(asctime)s [%(levelname)-5.5s]  %(message)s")
+    rootLogger = logging.getLogger()
+    rootLogger.setLevel(logging.INFO)
+    consoleHandler = logging.StreamHandler()
+    consoleHandler.setFormatter(logFormatter)
+    rootLogger.addHandler(consoleHandler)
+    if debug:
+        rootLogger.setLevel(logging.DEBUG)
 
 def is_import(node):
     '''
@@ -232,8 +237,8 @@ def main(argv=None):
 
     options = parser.parse_args()
 
-    if options.debug:
-        rootLogger.setLevel(logging.DEBUG)
+    # configure logging
+    config_logging(options.debug)
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename)
