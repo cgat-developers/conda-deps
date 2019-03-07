@@ -178,25 +178,29 @@ def scan_imports(filename):
 
     logging.debug('Scaning file: {}'.format(filename))
 
-    # parse script with Python's AST module:
-    # https://docs.python.org/3/library/ast.html#module-ast
-    with open(filename) as f:
-        tree = ast.parse(f.read())
-
     deps = set()
 
-    # inspired by
-    # http://bit.ly/2rDf5xu
-    # http://bit.ly/2r0Uv9t
-    # really helpful, used astviewer (installed in a conda-env) to inspect examples
-    # https://github.com/titusjan/astviewer
-    for node in ast.walk(tree):
-        module = is_import(node)
-        if module is not None and not is_python_std(module):
-            module = cleanup_import(module)
-            module = translate_import(module)
-            if module != "ignore":
-                deps.add(module)
+    # parse script with Python's AST module:
+    # https://docs.python.org/3/library/ast.html#module-ast
+    try:
+        with open(filename) as f:
+            tree = ast.parse(f.read())
+
+        # inspired by
+        # http://bit.ly/2rDf5xu
+        # http://bit.ly/2r0Uv9t
+        # really helpful, used astviewer (installed in a conda-env) to inspect examples
+        # https://github.com/titusjan/astviewer
+        for node in ast.walk(tree):
+            module = is_import(node)
+            if module is not None and not is_python_std(module):
+                module = cleanup_import(module)
+                module = translate_import(module)
+                if module != "ignore":
+                    deps.add(module)
+
+    except BaseException:
+        logging.warning("Could not parse file: {}".format(filename))
 
     return deps
 
