@@ -58,6 +58,7 @@ import logging
 PY_DEPS = json.load(
     open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
 
+
 def config_logging(debug):
     '''
        Auxiliary function to configure logging
@@ -73,6 +74,7 @@ def config_logging(debug):
     rootLogger.addHandler(consoleHandler)
     if debug:
         rootLogger.setLevel(logging.DEBUG)
+
 
 def is_import(node):
     '''
