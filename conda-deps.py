@@ -259,7 +259,8 @@ def print_conda_env(deps, envname="myenv",
     for c in envchannels:
         print(" - {}".format(c))
     print("dependencies:")
-    for d in deps:
+    print(" - python")
+    for d in sorted(deps):
         print(" - {}".format(d))
 
 
