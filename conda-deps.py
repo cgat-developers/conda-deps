@@ -70,7 +70,7 @@ def config_logging(debug):
     # https://realpython.com/python-logging/
     # https://bit.ly/2VHKM44
     logFormatter = logging.Formatter(
-        "%(asctime)s [%(levelname)-5.5s]  %(message)s")
+        "# %(asctime)s [%(levelname)-5.5s]  %(message)s")
     rootLogger = logging.getLogger()
     rootLogger.setLevel(logging.INFO)
     consoleHandler = logging.StreamHandler()
@@ -205,7 +205,7 @@ def scan_imports(filename):
     return deps
 
 
-def check_python_deps(filename):
+def check_python_deps(filename, exclude_folder):
     '''
        Auxiliary function to detect whether input is a file or a folder
        and operate accordingly
@@ -221,6 +221,11 @@ def check_python_deps(filename):
     if os.path.isdir(filename):
         # scan all python files in the folder
         for dirpath, dirs, files in os.walk(filename):
+            for d in dirs:
+                full_dir = os.path.abspath(os.path.join(dirpath, d))
+                if full_dir in exclude_folder:
+                    dirs.remove(d)
+                    logging.debug("not going down {}".format(full_dir))
             for f in files:
                 if f.endswith(".py"):
                     scan_this.append(os.path.join(dirpath, f))
@@ -279,6 +284,10 @@ def main(argv=None):
                         help="Print debugging info",
                         action="store_true",
                         default=False)
+    parser.add_argument("--exclude-folder",
+                        help="Path to a folder to exclude",
+                        action="append",
+                        default=[])
 
     options = parser.parse_args()
 
@@ -286,7 +295,7 @@ def main(argv=None):
     config_logging(options.debug)
 
     # get dependencies dependencies
-    deps = check_python_deps(options.filename)
+    deps = check_python_deps(options.filename, list(map(os.path.abspath, options.exclude_folder)))
 
     # print info about dependencies
     print_conda_env(deps)
