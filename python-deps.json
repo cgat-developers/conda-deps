@@ -18,5 +18,6 @@
 "CGATReport":"cgat-report",
 "cPickle":"ignore",
 "XGram":"ignore",
-"xml":"ignore"
+"xml":"ignore",
+"yaml":"pyyaml"
 }    
