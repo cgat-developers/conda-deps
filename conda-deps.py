@@ -295,7 +295,8 @@ def main(argv=None):
     config_logging(options.debug)
 
     # get dependencies dependencies
-    deps = check_python_deps(options.filename, list(map(os.path.abspath, options.exclude_folder)))
+    deps = check_python_deps(options.filename, list(
+        map(os.path.abspath, options.exclude_folder)))
 
     # print info about dependencies
     print_conda_env(deps)
