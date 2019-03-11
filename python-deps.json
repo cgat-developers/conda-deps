@@ -6,7 +6,6 @@
 "bs4":"beautifulsoup4",
 "bx":"bx-python",
 "configparser":"ignore",
-"drmaa":"python-drmaa",
 "lzo":"python-lzo",
 "metaphlan_utils":"ignore",
 "pyBigWig":"pybigwig",
