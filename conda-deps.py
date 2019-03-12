@@ -221,7 +221,7 @@ def check_python_deps(filename, exclude_folder):
     if os.path.isdir(filename):
         # scan all python files in the folder
         for dirpath, dirs, files in os.walk(filename):
-            for d in dirs:
+            for d in dirs.copy():
                 full_dir = os.path.abspath(os.path.join(dirpath, d))
                 if full_dir in exclude_folder:
                     dirs.remove(d)
