@@ -289,11 +289,19 @@ def main(argv=None):
                         help="Path to a folder to exclude",
                         action="append",
                         default=[])
+    parser.add_argument("--include-json",
+                        help="Path to a json file with project specific translations",
+                        action="append",
+                        default=[])
 
     options = parser.parse_args()
 
     # configure logging
     config_logging(options.debug)
+
+    # update default translation dict with project specific ones
+    for j in options.include_json:
+        PY_DEPS.update(json.load(open(j)))
 
     # get dependencies dependencies
     deps = check_python_deps(options.filename, list(
