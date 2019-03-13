@@ -16,6 +16,7 @@
 "weblogolib":"python-weblogo",
 "cgat":"cgat-apps",
 "CGATReport":"cgat-report",
+"cgatReport":"cgat-report",
 "cPickle":"ignore",
 "XGram":"ignore",
 "xml":"ignore",
