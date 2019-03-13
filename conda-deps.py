@@ -289,10 +289,11 @@ def main(argv=None):
                         help="Path to a folder to exclude",
                         action="append",
                         default=[])
-    parser.add_argument("--include-json",
-                        help="Path to a json file with project specific translations",
-                        action="append",
-                        default=[])
+    parser.add_argument(
+        "--include-json",
+        help="Path to a json file with project specific translations",
+        action="append",
+        default=[])
 
     options = parser.parse_args()
 
