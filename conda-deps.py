@@ -58,9 +58,12 @@ PY_STD = {'sys',
           'builtins',
           'xml'}
 
-# load translations for Python deps
-PY_DEPS = json.load(
-    open('{}/python-deps.json'.format(os.path.split(__file__)[0])))
+# load translations for Python deps from default json file
+(py_deps_folder, py_deps_file) = os.path.split(__file__)
+if len(py_deps_folder) == 0:
+    PY_DEPS = json.load(open('python-deps.json'))
+else:
+    PY_DEPS = json.load(open('{}/python-deps.json'.format(py_deps_folder)))
 
 
 def config_logging(debug):
