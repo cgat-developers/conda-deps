@@ -26,11 +26,43 @@ The result will be a yaml file like:
     - numpy
     - scipy
 
+# Installation
+
+This script only works in **Python 3** and will only scan properly **Python 3** source code.
+
+Here are a few commands to get the script up and running from scratch:
+
+    curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    bash Miniconda3-latest-Linux-x86_64.sh -b -p conda-install
+    source conda-install/etc/profile.d/conda.sh 
+    conda update --all --yes
+    conda create -n conda-deps python=3
+    conda activate conda-deps
+    wget https://raw.githubusercontent.com/cgat-developers/conda-deps/master/conda-deps.py
+    wget https://raw.githubusercontent.com/cgat-developers/conda-deps/master/python-deps.json
+    python conda-deps.py --help
+
 # Usage
 
-Assuming you have `conda-deps.py` in your working directory::
+Assuming you have `conda-deps.py` in your working directory:
 
     python conda-deps.py </path/to/file.py>
+    
+The script can also scan folders with Python code in it:
+
+    python conda-deps.py </path/to/folder/>
+    
+In case you want to exclude one or more subfolders, use the `--exclude-folder` option one or more times:
+
+    python conda-deps.py --exclude-folder </path/to/folder/folder1> </path/to/folder>
+    
+By default, the script looks for `import <module>` statements in files ending in `.py`. 
+First, it discards `module` when it is part of the Python Standard Library (e.g. `import os`).
+Otherwise, it assumes that there is a conda package called `module` (e.g. `import numpy` corresponds
+to the `numpy` package in conda). However, since that is not always the case, it translates `module`
+to something else by looking at a dictionary created by loading the
+[python-deps.json](https://github.com/cgat-developers/conda-deps/blob/master/python-deps.json) file.
+
 
 # References
 
