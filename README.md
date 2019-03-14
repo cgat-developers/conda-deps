@@ -7,13 +7,12 @@ as a result of the dependencies found in source code. Initially, this
 script will scan Python code only, but it would be great to have it 
 working for other programming languages as well.
 
-This script takes the path to a Python script, which contains import 
-statements like:
+This script will translate import statements in Python source code like:
 
     import numpy
     import scipy
 
-The result will be a yaml file like:
+into a conda environment yaml file:
 
     name: testenv
     
@@ -38,17 +37,16 @@ Here are a few commands to get the script up and running from scratch:
     conda update --all --yes
     conda create -n conda-deps python=3
     conda activate conda-deps
-    wget https://raw.githubusercontent.com/cgat-developers/conda-deps/master/conda-deps.py
-    wget https://raw.githubusercontent.com/cgat-developers/conda-deps/master/python-deps.json
+    wget https://raw.githubusercontent.com/cgat-developers/conda-deps/master/{conda-deps.py,python-deps.json}
     python conda-deps.py --help
 
 # Usage
 
-Assuming you have `conda-deps.py` in your working directory:
+Assuming you have `conda-deps.py` in your working directory, this is how you run the script:
 
     python conda-deps.py </path/to/file.py>
     
-The script can also scan folders with Python code in it:
+The script can also scan folders with Python code within:
 
     python conda-deps.py </path/to/folder/>
     
@@ -56,13 +54,38 @@ In case you want to exclude one or more subfolders, use the `--exclude-folder` o
 
     python conda-deps.py --exclude-folder </path/to/folder/folder1> </path/to/folder>
     
-By default, the script looks for `import <module>` statements in files ending in `.py`. 
-First, it discards `module` when it is part of the Python Standard Library (e.g. `import os`).
-Otherwise, it assumes that there is a conda package called `module` (e.g. `import numpy` corresponds
-to the `numpy` package in conda). However, since that is not always the case, it translates `module`
-to something else by looking at a dictionary created by loading the
-[python-deps.json](https://github.com/cgat-developers/conda-deps/blob/master/python-deps.json) file.
+# How it works
+    
+The script uses [Python's Abstract Syntax Trees](https://docs.python.org/3/library/ast.html#module-ast)
+to parse Python files. It looks for `import <module>` statements, and discards the modules belonging to the
+Python Standard Library (e.g. `import os`). It assumes that `<module>` has a corresponding conda package
+with the same name (e.g. `import numpy` corresponds to `conda install numpy`). However, that is not
+always the case and you can provide a proper translation between the module name and its corresponding
+conda package (e.g. `import yaml` will require `conda install pyyaml`) via the 
+[python-deps.json](https://github.com/cgat-developers/conda-deps/blob/master/python-deps.json) file, which
+will be loaded into a dictionary at the beginning of the script. It looks like this:
 
+    {
+        "Bio":"biopython",
+        "Cython":"cython",
+        "bs4":"beautifulsoup4",
+        "bx":"bx-python",
+        "lzo":"python-lzo",
+        "pyBigWig":"pybigwig",
+        "sklearn":"scikit-learn",
+        "web":"web.py",
+        "weblogolib":"python-weblogo",
+        "yaml":"pyyaml"
+    }    
+
+The key is the name in `import <module>` and the value is the name of the conda package. 
+
+The **python-deps.json** file is meant to be useful for generic use. However, it is possible to include
+additional json files specific to your project:
+
+    python conda-deps.py --include-json my-project.json </path/to/project/>
+
+The translations in **my-project.json** will take priority over those in **python-deps.json**.
 
 # References
 
