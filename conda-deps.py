@@ -46,12 +46,14 @@ https://github.com/titusjan/astviewer
 
 import sys
 
+# first things first
+# are you using Py3?
 if (sys.version_info < (3, 0, 0)):
     raise OSError('''You are using Python {}.{}.{}\n'''
-        '''This script only works with Python 3, sorry!'''
-        .format(sys.version_info.major,
-                sys.version_info.minor,
-                sys.version_info.micro))
+                  '''This script only works with Python 3, sorry!'''
+                  .format(sys.version_info.major,
+                          sys.version_info.minor,
+                          sys.version_info.micro))
     sys.exit(-1)
 
 import os
