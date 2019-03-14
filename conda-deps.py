@@ -65,9 +65,13 @@ import argparse
 import json
 import logging
 
+# modules part of the Python Standard Library
 PY_STD = {'sys',
           'builtins',
           'xml'}
+
+# Python files located inside the folder to scan
+PY_LOCAL = []
 
 # load translations for Python deps from default json file
 (py_deps_folder, py_deps_file) = os.path.split(__file__)
@@ -152,6 +156,24 @@ def is_python_std(name):
     return result
 
 
+def get_local_imports(folder):
+    '''
+       When scanning a folder, the import might refer
+       to a Python file inside the folder itself
+    '''
+
+    result = []
+
+    if os.path.isdir(folder) and os.access(folder, os.R_OK):
+        for dirpath, dirs, files in os.walk(folder):
+            for d in dirs:
+                result.append(d)
+            for f in files:
+                if f.endswith(".py"):
+                    result.append(os.path.splitext(f)[0])
+    return result
+
+
 def cleanup_import(name):
     '''
        Auxiliary function to extract the main module name
@@ -210,7 +232,7 @@ def scan_imports(filename):
             if module is not None and not is_python_std(module):
                 module = cleanup_import(module)
                 module = translate_import(module)
-                if module != "ignore":
+                if module != "ignore" and module not in PY_LOCAL:
                     deps.add(module)
 
     except BaseException:
@@ -310,6 +332,10 @@ def main(argv=None):
 
     # configure logging
     config_logging(options.debug)
+
+    # get a list of all Python files inside the folder
+    global PY_LOCAL
+    PY_LOCAL = get_local_imports(options.filename)
 
     # update default translation dict with project specific ones
     for j in options.include_json:
