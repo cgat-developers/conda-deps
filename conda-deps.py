@@ -258,10 +258,11 @@ def print_conda_env(deps, envname="myenv",
         return
 
     print("\nname: {}".format(envname))
-    print("channels:")
+
+    print("\nchannels:")
     for c in envchannels:
         print(" - {}".format(c))
-    print("dependencies:")
+    print("\ndependencies:")
     print(" - python")
     for d in sorted(deps):
         print(" - {}".format(d))
