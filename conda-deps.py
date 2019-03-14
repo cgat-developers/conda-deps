@@ -44,9 +44,18 @@ https://github.com/titusjan/astviewer
 
 '''
 
+import sys
+
+if (sys.version_info < (3, 0, 0)):
+    raise OSError('''You are using Python {}.{}.{}\n'''
+        '''This script only works with Python 3, sorry!'''
+        .format(sys.version_info.major,
+                sys.version_info.minor,
+                sys.version_info.micro))
+    sys.exit(-1)
+
 import os
 import shutil
-import sys
 import importlib.util
 import re
 import ast
@@ -272,10 +281,6 @@ def main(argv=None):
     """script main.
     parses command line options in sys.argv, unless *argv* is given.
     """
-
-    if (sys.version_info < (3, 0, 0)):
-        raise OSError("This script is Python 3 only")
-        sys.exit(-1)
 
     if argv is None:
         argv = sys.argv
