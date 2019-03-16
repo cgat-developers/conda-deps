@@ -327,6 +327,11 @@ def main(argv=None):
         help="Path to a json file with project specific translations",
         action="append",
         default=[])
+    parser.add_argument(
+        "--include-py-files",
+        help="Path to additional Python files and/or folders to scan",
+        action="append",
+        default=[])
 
     options = parser.parse_args()
 
@@ -341,9 +346,14 @@ def main(argv=None):
     for j in options.include_json:
         PY_DEPS.update(json.load(open(j)))
 
-    # get dependencies dependencies
+    # get dependencies
     deps = check_python_deps(options.filename, list(
         map(os.path.abspath, options.exclude_folder)))
+
+    # scan additional dependencies
+    for f in options.include_py_files:
+        deps.update(check_python_deps(f, list(
+            map(os.path.abspath, options.exclude_folder))))
 
     # print info about dependencies
     print_conda_env(deps)
