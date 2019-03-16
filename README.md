@@ -53,6 +53,10 @@ The script can also scan folders with Python code within:
 In case you want to exclude one or more subfolders, use the `--exclude-folder` option one or more times:
 
     python conda-deps.py --exclude-folder </path/to/folder/folder1> </path/to/folder>
+
+You may also want to scan additonal Python files of folders:
+
+    python conda-deps.py <path/to/folder> --include-py-files my-script.py --include-py-files </another/folder>
     
 # How it works
     
