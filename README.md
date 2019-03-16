@@ -91,6 +91,11 @@ additional json files specific to your project:
 
 The translations in **my-project.json** will take priority over those in **python-deps.json**.
 
+# Related work
+
+This script has been inspired by [snakefood](http://furius.ca/snakefood/) which is a great tool
+but it works only with Python 2.
+
 # References
 
 * https://docs.python.org/3/library/ast.html#module-ast
