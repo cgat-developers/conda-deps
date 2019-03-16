@@ -147,6 +147,7 @@ def is_python_std(name):
 
     if module_path is not None:
         result = 'site-packages' not in module_path or \
+            'dist-packages' not in module_path or \
             python_path in module_path
 
     logging.debug(
