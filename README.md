@@ -91,7 +91,7 @@ additional json files specific to your project:
 
 The translations in **my-project.json** will take priority over those in **python-deps.json**.
 
-# Related work
+# Related tools
 
 * [snakefood](http://furius.ca/snakefood/): a more comprehensive tool but it works only with Python 2.
 * [pipreqs](https://github.com/bndr/pipreqs): does a similar job but for **requirements.txt** files and pip.
