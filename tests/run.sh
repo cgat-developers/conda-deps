@@ -66,6 +66,7 @@ do
     env_f=`echo $f | sed 's/.py/.yml/g'`
     log " Comparing: python3 conda-deps.py $f"
     log " with: $env_f"
+    python3 conda-deps.py --debug $f
     diff <(python3 conda-deps.py $f) <(cat $env_f)
     if [[ "$?" -eq "0" ]] ; then
         log " Test succeeded for: $f!"
