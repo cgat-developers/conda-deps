@@ -1,0 +1,5 @@
+
+language: minimal
+dist: xenial
+script:
+  - bash tests/run.sh
