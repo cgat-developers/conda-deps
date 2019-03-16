@@ -93,8 +93,8 @@ The translations in **my-project.json** will take priority over those in **pytho
 
 # Related work
 
-This script has been inspired by [snakefood](http://furius.ca/snakefood/) which is a great tool
-but it works only with Python 2.
+* [snakefood](http://furius.ca/snakefood/): a more comprehensive tool but it works only with Python 2.
+* [pipreqs](https://github.com/bndr/pipreqs): does a similar job but for **requirements.txt** files and pip.
 
 # References
 
