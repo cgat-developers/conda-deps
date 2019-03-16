@@ -40,7 +40,7 @@ error_handler() {
     echo " ${SCRIPT_NAME} ${SCRIPT_PARAMS}"
     echo
     echo " Please copy and paste this error and report it via Git Hub: "
-    echo " https://github.com/cgat-developers/cgat-core/issues "
+    echo " https://github.com/cgat-developers/conda-deps/issues "
     echo " ########################################################## "
 }
 
@@ -64,7 +64,8 @@ report_error() {
 for f in `ls tests/*.py` ;
 do
     env_f=`echo $f | sed 's/.py/.yml/g'`
-    log " Testing: python3 conda-deps.py $f"
+    log " Comparing: python3 conda-deps.py $f"
+    log " with: $env_f"
     diff <(python3 conda-deps.py $f) <(cat $env_f)
     if [[ "$?" -eq "0" ]] ; then
         log " Test succeeded for: $f!"
