@@ -56,7 +56,7 @@ In case you want to exclude one or more subfolders, use the `--exclude-folder` o
 
 You may also want to scan additonal Python files of folders:
 
-    python conda-deps.py <path/to/folder> --include-py-files my-script.py --include-py-files </another/folder>
+    python conda-deps.py </path/to/folder> --include-py-files my-script.py --include-py-files </another/folder>
     
 # How it works
     
