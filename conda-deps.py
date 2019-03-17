@@ -213,7 +213,7 @@ def scan_imports(filename):
     if not os.access(filename, os.R_OK):
         raise IOError("File {} can't be read\n".format(filename))
 
-    logging.debug('Scaning file: {}'.format(filename))
+    logging.debug('Scanning file: {}'.format(filename))
 
     deps = set()
 

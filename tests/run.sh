@@ -61,6 +61,7 @@ report_error() {
     exit 1
 }
 
+# scan all python files in test folder
 ALL=`ls tests/*.py | head -1`
 for f in `ls tests/*.py` ;
 do
