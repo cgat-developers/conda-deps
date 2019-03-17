@@ -1,0 +1,23 @@
+
+name: myenv
+
+channels:
+ - conda-forge
+ - bioconda
+ - defaults
+
+dependencies:
+ - python
+ - cgat-apps
+ - cgatcore
+ - cgatpipelines
+ - matplotlib
+ - numpy
+ - pandas
+ - pysam
+ - python-lzo
+ - pyyaml
+ - rpy2
+ - ruffus
+ - scipy
+ - seaborn
