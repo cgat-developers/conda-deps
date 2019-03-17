@@ -14,7 +14,7 @@ set -o pipefail
 #set -o nounset
 
 # trace what gets executed
-set -o xtrace
+#set -o xtrace
 
 # Bash traps
 # http://aplawrence.com/Basics/trapping_errors.html
