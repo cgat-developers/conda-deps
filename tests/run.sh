@@ -61,8 +61,10 @@ report_error() {
     exit 1
 }
 
+ALL=`ls tests/*.py | head -1`
 for f in `ls tests/*.py` ;
 do
+    ALL=$ALL" --include-py-files "$f
     env_f=`echo $f | sed 's/.py/.yml/g'`
     log " Comparing: python3 conda-deps.py $f"
     log " with: $env_f"
@@ -74,3 +76,12 @@ do
         report_error " Test failed for: $f"
     fi
 done
+
+log " Scanning all: python3 conda-deps.py $ALL"
+python3 conda-deps.py --debug $ALL
+diff <(python3 conda-deps.py $ALL) <(cat tests/all.yml)
+if [[ "$?" -eq "0" ]] ; then
+    log " Test succeeded for all files together!"
+else
+    report_error " Test failed for all files together."
+fi
