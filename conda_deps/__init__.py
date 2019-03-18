@@ -1,1 +1,1 @@
-name = "conda-deps"
+name = "conda_deps"
