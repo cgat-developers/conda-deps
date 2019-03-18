@@ -1,5 +1,5 @@
 
 # Include the following files
 include LICENSE
-include conda-deps/python-deps.json
+include conda_deps/python_deps.json
 
