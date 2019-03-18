@@ -69,8 +69,8 @@ do
     env_f=`echo $f | sed 's/.py/.yml/g'`
     log " Comparing: python3 conda-deps.py $f"
     log " with: $env_f"
-    python3 conda-deps.py --debug $f
-    diff <(python3 conda-deps.py $f) <(cat $env_f)
+    python3 conda-deps/conda-deps.py --debug $f
+    diff <(python3 conda-deps/conda-deps.py $f) <(cat $env_f)
     if [[ "$?" -eq "0" ]] ; then
         log " Test succeeded for: $f!"
     else
@@ -79,7 +79,7 @@ do
 done
 
 log " Scanning all: python3 conda-deps.py $ALL"
-python3 conda-deps.py --debug $ALL
+python3 conda-deps/conda-deps.py --debug $ALL
 diff <(python3 conda-deps.py $ALL) <(cat tests/all.yml)
 if [[ "$?" -eq "0" ]] ; then
     log " Test succeeded for all files together!"
