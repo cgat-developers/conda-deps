@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="conda-deps",
+    name="conda_deps",
     version="0.0.1",
     author="cgat-developers",
     author_email="sebastian.luna.valero@gmail.com",
