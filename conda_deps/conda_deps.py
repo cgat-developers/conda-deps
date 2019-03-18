@@ -76,9 +76,9 @@ PY_LOCAL = []
 # load translations for Python deps from default json file
 (py_deps_folder, py_deps_file) = os.path.split(__file__)
 if len(py_deps_folder) == 0:
-    PY_DEPS = json.load(open('python-deps.json'))
+    PY_DEPS = json.load(open('python_deps.json'))
 else:
-    PY_DEPS = json.load(open('{}/python-deps.json'.format(py_deps_folder)))
+    PY_DEPS = json.load(open('{}/python_deps.json'.format(py_deps_folder)))
 
 
 def config_logging(debug):
@@ -193,9 +193,9 @@ def translate_import(name):
        The translation assumes that by default a package
        will be named the same as its import (e.g. numpy).
        When that's not the case, we convert it using the
-       translation detailed in the file "python-deps.json"
+       translation detailed in the file "python_deps.json"
 
-       python-deps.json will be growing over time as
+       python_deps.json will be growing over time as
        we find more cases where the package name and the
        import name differs
     '''
