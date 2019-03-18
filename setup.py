@@ -19,6 +19,7 @@ setuptools.setup(
     entry_points = {
         'console_scripts': ['conda_deps=conda_deps.conda_deps:main'],
     },
+    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
