@@ -1,5 +1,5 @@
 '''
-conda-deps.py - translate dependencies into a conda recipe
+conda_deps.py - translate dependencies into a conda recipe
 ==========================================================
 
 Purpose
@@ -32,7 +32,7 @@ The result will be a yaml file like:
 Usage
 -----
 
-.. python conda-deps.py </path/to/file.py>
+.. python conda_deps.py </path/to/file.py>
 
 References
 ----------
