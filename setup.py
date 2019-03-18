@@ -1,7 +1,9 @@
 import setuptools
 
-# Reference:
+# References:
 # https://packaging.python.org/tutorials/packaging-projects/
+# https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html
+# https://python-packaging.readthedocs.io/en/latest/non-code-files.html
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
