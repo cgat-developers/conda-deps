@@ -80,7 +80,7 @@ done
 
 log " Scanning all: python3 conda_deps.py $ALL"
 python3 conda_deps/conda_deps.py --debug $ALL
-diff <(python3 conda_deps.py $ALL) <(cat tests/all.yml)
+diff <(python3 conda_deps/conda_deps.py $ALL) <(cat tests/all.yml)
 if [[ "$?" -eq "0" ]] ; then
     log " Test succeeded for all files together!"
 else
