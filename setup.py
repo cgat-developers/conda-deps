@@ -10,13 +10,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="conda_deps",
-    version="0.0.1",
+    version="0.0.2",
     author="cgat-developers",
     author_email="sebastian.luna.valero@gmail.com",
     description="Generate conda environment files from Python source code",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/pypa/sampleproject",
+    url="https://github.com/cgat-developers/conda-deps",
     packages=setuptools.find_packages(),
     entry_points = {
         'console_scripts': ['conda_deps=conda_deps.conda_deps:main'],
