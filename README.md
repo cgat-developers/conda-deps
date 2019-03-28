@@ -25,7 +25,7 @@ into a conda environment yaml file:
 
 # Installation
 
-This script only works in **Python 3** and will only scan properly **Python 3** source code.
+`conda_deps` only works in **Python 3** and will only scan properly **Python 3** source code.
 
 `conda_deps` has been uploaded to `conda-forge` so you can install it with:
 
