@@ -1,8 +1,8 @@
 # Purpose
 
-The goal of this script is to generate a conda yaml environment file as a result of
-the dependencies found in source code. Initially, this script will scan Python code only,
-but it would be great to have it working for other programming languages as well.
+The goal of `conda_deps` is to generate a [conda environment file](https://bit.ly/2THhLnA) as a result of
+the dependencies found in source code. Initially, this script will scan Python code only, but 
+it would be great to have it working for other programming languages as well.
 
 This script will translate import statements in Python source code like:
 
@@ -19,6 +19,7 @@ into a conda environment yaml file:
     - defaults
 
     dependencies:
+    - python
     - numpy
     - scipy
 
@@ -26,30 +27,32 @@ into a conda environment yaml file:
 
 This script only works in **Python 3** and will only scan properly **Python 3** source code.
 
-Here are a few commands to get the script up and running from scratch:
+`conda_deps` has been uploaded to `conda-forge` so you can install it with:
 
+    # if you don't have conda available:
     curl -O https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     bash Miniconda3-latest-Linux-x86_64.sh -b -p conda-install
     source conda-install/etc/profile.d/conda.sh 
     conda update --all --yes
-    conda create -n conda_deps python=3
+    
+    # once conda is available:
+    conda create --name conda_deps --channel conda-forge conda_deps
     conda activate conda_deps
-    wget https://raw.githubusercontent.com/cgat-developers/conda_deps/master/{conda_deps.py,python_deps.json}
-    python conda_deps.py --help
+    conda_deps --help
 
 # Usage
 
-Assuming you have `conda_deps.py` in your working directory, this is how you run the script:
+This is how you scan a single Python file:
 
-    python conda_deps.py </path/to/file.py>
+    conda_deps </path/to/file.py>
     
-The script can also scan folders with Python code within:
+The script can also scan folders:
 
-    python conda_deps.py </path/to/folder/>
+    conda_deps </path/to/folder/>
     
 In case you want to exclude one or more subfolders, use the `--exclude-folder` option one or more times:
 
-    python conda_deps.py --exclude-folder </path/to/folder/folder1> </path/to/folder>
+    conda_deps --exclude-folder </path/to/folder/folder1> </path/to/folder>
 
 You may also want to scan additonal Python files of folders:
 
@@ -87,6 +90,9 @@ additional json files specific to your project:
     python conda_deps.py --include-json my_project.json </path/to/project/>
 
 The translations in **my_project.json** will take priority over those in **python_deps.json**.
+
+If you find that there are missing translations in the general purpose **python_deps.json** file, please
+feel free to open a pull request and it will be added to it.
 
 # Related tools
 
