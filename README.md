@@ -92,7 +92,7 @@ additional json files specific to your project:
 The translations in **my_project.json** will take priority over those in **python_deps.json**.
 
 If you find that there are missing translations in the general purpose **python_deps.json** file, please
-feel free to open a pull request and it will be added to it.
+feel free to open a pull request to add more.
 
 # Related tools
 
