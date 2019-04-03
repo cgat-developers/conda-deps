@@ -204,7 +204,7 @@ def scan_python_imports(filename):
     return deps
 
 
-def translate_r_import(name):
+def translate_r_library(name):
     '''
        Auxiliary function to translate the module name
        into its conda package (e.g. library(qvalue) -> bioconductor-qvalue)
@@ -244,9 +244,13 @@ def scan_r_imports(filename):
         # the result of re.findall is a list of tuples where
         # (match.group(0), match.group(1), match.group(2))
         # and we are just interested in group(1)
-        library = r[1]
-        if library != "ignore":
-            deps.update([library])
+        orig_library = r[1]
+        tran_library = translate_r_library(orig_library)
+        if tran_library != "ignore":
+            deps.update([tran_library])
+            logging.debug('Translating R dependency {} into {}'.format(orig_library, tran_library))
+        else:
+            logging.debug('Ignoring R dependency: {}'.format(orig_library))
 
     return deps
 
@@ -320,6 +324,7 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
     for d in sorted(r_deps):
         if first:
             print(" - r-base")
+            first = False
         print(" - {}".format(d))
 
 
