@@ -193,10 +193,13 @@ def scan_python_imports(filename):
         for node in ast.walk(tree):
             module = is_import(node)
             if module is not None and not is_python_std(module):
-                module = cleanup_import(module)
-                module = translate_python_import(module)
-                if module != "ignore" and module not in PY_LOCAL:
-                    deps.add(module)
+                orig_module = cleanup_import(module)
+                tran_module = translate_python_import(orig_module)
+                if tran_module != "ignore" and tran_module not in PY_LOCAL:
+                    deps.add(tran_module)
+                    logging.debug('Translating Python dependency {} into {}'.format(orig_module, tran_module))
+                else:
+                    logging.debug('Ignoring Python dependency: {}'.format(orig_module))
 
     except BaseException:
         logging.warning("Could not parse file: {}".format(filename))
