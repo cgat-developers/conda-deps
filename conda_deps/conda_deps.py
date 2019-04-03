@@ -1,48 +1,3 @@
-'''
-conda_deps.py - translate dependencies into a conda recipe
-==========================================================
-
-Purpose
--------
-
-.. The goal of this script is to generate a conda yaml environment file
-as a result of the dependencies found in source code. Initially, this
-script will scan Python code only, but it would be great to have it
-working for other programming languages as well.
-
-This script takes the path to a Python script, which contains import
-statements like:
-
-    import numpy
-    import scipy
-
-The result will be a yaml file like:
-
-    name: testenv
-
-    channels:
-    - conda-forge
-    - bioconda
-    - defaults
-
-    dependencies:
-    - numpy
-    - scipy
-
-Usage
------
-
-.. python conda_deps.py </path/to/file.py>
-
-References
-----------
-
-https://docs.python.org/3/library/ast.html#module-ast
-http://bit.ly/2rDf5xu
-http://bit.ly/2r0Uv9t
-https://github.com/titusjan/astviewer
-
-'''
 
 import sys
 
@@ -79,6 +34,13 @@ if len(py_deps_folder) == 0:
     PY_DEPS = json.load(open('python_deps.json'))
 else:
     PY_DEPS = json.load(open('{}/python_deps.json'.format(py_deps_folder)))
+
+# load translations for R deps from default json file
+(r_deps_folder, r_deps_file) = os.path.split(__file__)
+if len(r_deps_folder) == 0:
+    R_DEPS = json.load(open('r_deps.json'))
+else:
+    R_DEPS = json.load(open('{}/r_deps.json'.format(py_deps_folder)))
 
 
 def config_logging(debug):
@@ -185,13 +147,13 @@ def cleanup_import(name):
     return result.group(1)
 
 
-def translate_import(name):
+def translate_python_import(name):
     '''
        Auxiliary function to translate the module name
        into its conda package (e.g. cgat -> cgat-apps)
 
        The translation assumes that by default a package
-       will be named the same as its import (e.g. numpy).
+       will be named the same as its import (e.g. numpy -> numpy).
        When that's not the case, we convert it using the
        translation detailed in the file "python_deps.json"
 
@@ -205,15 +167,15 @@ def translate_import(name):
     return result
 
 
-def scan_imports(filename):
+def scan_python_imports(filename):
     '''
-       Auxiliary function to get imports from a single file
+       Auxiliary function to get Python imports from a single file
     '''
     # check input is correct
     if not os.access(filename, os.R_OK):
         raise IOError("File {} can't be read\n".format(filename))
 
-    logging.debug('Scanning file: {}'.format(filename))
+    logging.debug('Python scan for file: {}'.format(filename))
 
     deps = set()
 
@@ -232,7 +194,7 @@ def scan_imports(filename):
             module = is_import(node)
             if module is not None and not is_python_std(module):
                 module = cleanup_import(module)
-                module = translate_import(module)
+                module = translate_python_import(module)
                 if module != "ignore" and module not in PY_LOCAL:
                     deps.add(module)
 
@@ -242,7 +204,54 @@ def scan_imports(filename):
     return deps
 
 
-def check_python_deps(filename, exclude_folder):
+def translate_r_import(name):
+    '''
+       Auxiliary function to translate the module name
+       into its conda package (e.g. library(qvalue) -> bioconductor-qvalue)
+
+       The translation assumes that by default a package
+       will be named the same as its import (e.g. ? ).
+       When that's not the case, we convert it using the
+       translation detailed in the file "r_deps.json"
+
+       r_deps.json will be growing over time as
+       we find more cases where the package name and the
+       import name differs
+    '''
+
+    result = R_DEPS.get(name, name)
+
+    return result
+
+
+def scan_r_imports(filename):
+    '''
+       Auxiliary function to get R imports from a single file
+    '''
+    # check input is correct
+    if not os.access(filename, os.R_OK):
+        raise IOError("File {} can't be read\n".format(filename))
+
+    logging.debug('R scan for file: {}'.format(filename))
+
+    deps = set()
+
+    with open(filename) as f:
+        data = f.read()
+
+    results = re.findall(r"library\((\W*)(\w*)(\W*)\)", data)
+    for r in results:
+        # the result of re.findall is a list of tuples where
+        # (match.group(0), match.group(1), match.group(2))
+        # and we are just interested in group(1)
+        library = r[1]
+        if library != "ignore":
+            deps.update([library])
+
+    return deps
+
+
+def check_deps(filename, exclude_folder):
     '''
        Auxiliary function to detect whether input is a file or a folder
        and operate accordingly
@@ -268,26 +277,30 @@ def check_python_deps(filename, exclude_folder):
                     scan_this.append(os.path.join(dirpath, f))
     else:
         # case of single file
-        scan_this.append(filename)
+        if filename.endswith(".py"):
+            scan_this.append(filename)
+        else:
+            logging.warning("{} is not a Python file.".format(filename))
 
     # set of dependencies
-    all_deps = set()
+    python_deps = set()
+    r_deps = set()
 
     # scan all files
     for f in scan_this:
-        deps = scan_imports(f)
-        all_deps.update(deps)
+        python_deps.update(scan_python_imports(f))
+        r_deps.update(scan_r_imports(f))
 
-    return all_deps
+    return python_deps, r_deps
 
 
-def print_conda_env(deps, envname="myenv",
+def print_conda_env(python_deps, r_deps, envname="myenv",
                     envchannels=["conda-forge", "bioconda", "defaults"]):
     '''
        Print conda environment file
     '''
 
-    if len(deps) == 0:
+    if len(python_deps) == 0 and len(r_deps) == 0:
         print("\nNo dependencies found.\n")
         return
 
@@ -297,8 +310,18 @@ def print_conda_env(deps, envname="myenv",
     for c in envchannels:
         print(" - {}".format(c))
     print("\ndependencies:")
-    print(" - python")
-    for d in sorted(deps):
+    first = True
+    for d in sorted(python_deps):
+        if first:
+            print("# Python deps")
+            print(" - python")
+            first = False
+        print(" - {}".format(d))
+    first = True
+    for d in sorted(r_deps):
+        if first:
+            print("# R deps")
+            print(" - r-base")
         print(" - {}".format(d))
 
 
@@ -348,16 +371,18 @@ def main(argv=None):
         PY_DEPS.update(json.load(open(j)))
 
     # get dependencies
-    deps = check_python_deps(options.filename, list(
+    (python_deps, r_deps) = check_deps(options.filename, list(
         map(os.path.abspath, options.exclude_folder)))
 
     # scan additional dependencies
     for f in options.include_py_files:
-        deps.update(check_python_deps(f, list(
-            map(os.path.abspath, options.exclude_folder))))
+        (deps_py, deps_r) = check_deps(f, list(
+            map(os.path.abspath, options.exclude_folder)))
+        python_deps.update(deps_py)
+        r_deps.update(deps_r)
 
     # print info about dependencies
-    print_conda_env(deps)
+    print_conda_env(python_deps, r_deps)
 
 
 if __name__ == "__main__":
