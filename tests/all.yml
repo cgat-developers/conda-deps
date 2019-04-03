@@ -21,3 +21,9 @@ dependencies:
  - ruffus
  - scipy
  - seaborn
+ - r-base
+ - r-ggplot2
+ - r-gmd
+ - r-hmisc
+ - r-rcolorbrewer
+ - r-reshape2
