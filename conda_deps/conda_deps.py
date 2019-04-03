@@ -313,14 +313,12 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
     first = True
     for d in sorted(python_deps):
         if first:
-            print("# Python deps")
             print(" - python")
             first = False
         print(" - {}".format(d))
     first = True
     for d in sorted(r_deps):
         if first:
-            print("# R deps")
             print(" - r-base")
         print(" - {}".format(d))
 
