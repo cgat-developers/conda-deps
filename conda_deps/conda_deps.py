@@ -369,7 +369,7 @@ def main(argv=None):
         action="append",
         default=[])
     parser.add_argument(
-        "--include-py-files",
+        "--include-file",
         help="Path to additional Python files and/or folders to scan",
         action="append",
         default=[])
@@ -392,7 +392,7 @@ def main(argv=None):
         map(os.path.abspath, options.exclude_folder)))
 
     # scan additional dependencies
-    for f in options.include_py_files:
+    for f in options.include_file:
         (deps_py, deps_r) = check_deps(f, list(
             map(os.path.abspath, options.exclude_folder)))
         python_deps.update(deps_py)
