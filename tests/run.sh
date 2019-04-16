@@ -65,7 +65,7 @@ report_error() {
 ALL=`ls tests/*.py | head -1`
 for f in `ls tests/*.py` ;
 do
-    ALL=$ALL" --include-py-files "$f
+    ALL=$ALL" --include-files "$f
     env_f=`echo $f | sed 's/.py/.yml/g'`
     log " Comparing: python3 conda_deps.py $f"
     log " with: $env_f"
