@@ -271,7 +271,8 @@ def check_deps(filename, exclude_folder):
         raise IOError("File {} can't be read\n".format(filename))
 
     # list of files to scan
-    scan_this = []
+    scan_python = []
+    scan_r = []
 
     if os.path.isdir(filename):
         # scan all python files in the folder
@@ -283,20 +284,26 @@ def check_deps(filename, exclude_folder):
                     logging.debug("not going down {}".format(full_dir))
             for f in files:
                 if f.endswith(".py"):
-                    scan_this.append(os.path.join(dirpath, f))
+                    scan_python.append(os.path.join(dirpath, f))
+                    scan_r.append(os.path.join(dirpath, f))
+                elif f.endswith(".R"):
+                    scan_r.append(os.path.join(dirpath, f))
     else:
         # case of single file
         if filename.endswith(".py"):
-            scan_this.append(filename)
+            scan_python.append(filename)
+            scan_r.append(filename)
+        elif filename.endswith(".R"):
+            scan_r.append(filename)
         else:
-            logging.warning("{} is not a Python file.".format(filename))
+            logging.warning("Unrecognized file format. Expected files ending in .py or .R".format(filename))
 
     # set of dependencies
     python_deps = set()
     r_deps = set()
 
     # scan all files
-    for f in scan_this:
+    for f in scan_python:
         python_deps.update(scan_python_imports(f))
         r_deps.update(scan_r_imports(f))
 
