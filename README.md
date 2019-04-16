@@ -88,7 +88,7 @@ Python Standard Library (e.g. `import os`). It assumes that `<module>` has a cor
 with the same name (e.g. `import numpy` corresponds to `conda install numpy`). However, that is not
 always the case and you can provide a proper translation between the module name and its corresponding
 conda package (e.g. `import yaml` will require `conda install pyyaml`) via the 
-[python_deps.json](https://github.com/cgat-developers/conda-deps/blob/master/python_deps.json) file, which
+[python_deps.json](https://github.com/cgat-developers/conda-deps/blob/master/conda_deps/python_deps.json) file, which
 will be loaded into a dictionary at the beginning of the script. It looks like this:
 
     {
