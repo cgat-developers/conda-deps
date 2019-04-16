@@ -130,7 +130,9 @@ def get_local_imports(folder):
     if os.path.isdir(folder) and os.access(folder, os.R_OK):
         for dirpath, dirs, files in os.walk(folder):
             for d in dirs:
-                result.append(d)
+                full_dir = os.path.abspath(os.path.join(dirpath, d))
+                if os.path.exists(os.path.join(full_dir, '__init__.py')):
+                    result.append(d)
             for f in files:
                 if f.endswith(".py"):
                     result.append(os.path.splitext(f)[0])
