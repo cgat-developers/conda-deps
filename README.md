@@ -109,7 +109,7 @@ The dictionary key is the name in `import <module>` and the value is the name of
 The **python_deps.json** file is meant to be useful for generic use. However, it is possible to include
 additional json files specific to your project:
 
-    python conda_deps.py --include-json my_project.json </path/to/project/>
+    conda_deps --include-py-json my_project.json </path/to/project/>
 
 The translations in **my_project.json** will take priority over those in **python_deps.json**.
 
@@ -141,7 +141,12 @@ file which will be loaded into a dictionary at the beginning of the script. Here
 
 In this case the dictionary key is the name in `library(name)` and the value is the name of the conda package.
 
-Please open a pull request if you want new R dependencies to be added to **r_deps.json**
+If you are missing a translation in **r_deps.json** you can either open a pull request to add it or include it
+in your own json file:
+
+    conda_deps --include-r-json my_project.json </path/to/project/>
+    
+Please note that the translations in **my_project.json** will take priority over those in **r_deps.json**.
 
 # Related tools
 
