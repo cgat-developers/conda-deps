@@ -305,6 +305,8 @@ def check_deps(filename, exclude_folder):
     # scan all files
     for f in scan_python:
         python_deps.update(scan_python_imports(f))
+
+    for f in scan_r:
         r_deps.update(scan_r_imports(f))
 
     return python_deps, r_deps
