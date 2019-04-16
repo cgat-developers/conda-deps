@@ -1,10 +1,10 @@
 # Purpose
 
 The goal of `conda_deps` is to generate a [conda environment file](https://bit.ly/2THhLnA) as a result of
-the dependencies found in source code. Initially, this script will scan Python code only, but 
-it would be great to have it working for other programming languages as well.
+the dependencies found in a repository. At the moment, it only translates Python and R dependencies
+but it would be great to have it working for other programming languages as well.
 
-This script will translate import statements in Python source code like:
+`conda_deps` translates import statements in Python source code like:
 
     import numpy
     import scipy
@@ -23,9 +23,29 @@ into a conda environment yaml file:
     - numpy
     - scipy
 
+For R it translates library imports like:
+
+    library(reshape2)
+    library(ggplot2)
+
+into:
+
+    name: testenv
+    
+    channels:
+    - conda-forge
+    - bioconda
+    - defaults
+
+    dependencies:
+    - r-base
+    - r-reshape2    
+    - r-ggplot2
+
 # Installation
 
 `conda_deps` only works in **Python 3** and will only scan properly **Python 3** source code.
+There should be no restriction in the case of R.
 
 `conda_deps` has been uploaded to `conda-forge` so you can install it with:
 
@@ -42,9 +62,9 @@ into a conda environment yaml file:
 
 # Usage
 
-This is how you scan a single Python file:
+This is how you scan a single Python or R file:
 
-    conda_deps </path/to/file.py>
+    conda_deps </path/to/filename>
     
 The script can also scan folders:
 
@@ -54,14 +74,16 @@ In case you want to exclude one or more subfolders, use the `--exclude-folder` o
 
     conda_deps --exclude-folder </path/to/folder/folder1> </path/to/folder>
 
-You may also want to scan additonal Python files of folders:
+You may also want to scan additonal files of folders:
 
-    python conda_deps.py </path/to/folder> --include-py-files my-script.py --include-py-files </another/folder>
+    python conda_deps.py </path/to/folder> --include-files my-script.py --include-files </another/folder>
     
 # How it works
+
+## Python source code
     
 The script uses [Python's Abstract Syntax Trees](https://docs.python.org/3/library/ast.html#module-ast)
-to parse Python files. It looks for `import <module>` statements, and discards the modules belonging to the
+to parse files ending in `.py`. It looks for `import <module>` statements, and discards the modules belonging to the
 Python Standard Library (e.g. `import os`). It assumes that `<module>` has a corresponding conda package
 with the same name (e.g. `import numpy` corresponds to `conda install numpy`). However, that is not
 always the case and you can provide a proper translation between the module name and its corresponding
@@ -82,7 +104,7 @@ will be loaded into a dictionary at the beginning of the script. It looks like t
         "yaml":"pyyaml"
     }    
 
-The key is the name in `import <module>` and the value is the name of the conda package. 
+The dictionary key is the name in `import <module>` and the value is the name of the conda package. 
 
 The **python_deps.json** file is meant to be useful for generic use. However, it is possible to include
 additional json files specific to your project:
@@ -93,6 +115,33 @@ The translations in **my_project.json** will take priority over those in **pytho
 
 If you find that there are missing translations in the general purpose **python_deps.json** file, please
 feel free to open a pull request to add more.
+
+## R source code
+
+In the case of R files, it uses `grep` to look for `library(name)` regular expressions in files ending in `.R`.
+The same way we use a `json` file to detail translations for Python, 
+we use the [r_deps.json](https://github.com/cgat-developers/conda-deps/blob/master/conda_deps/r_deps.json)
+file which will be loaded into a dictionary at the beginning of the script. Here is how it looks like:
+
+    {
+        "dplyr":"r-dplyr",
+        "edgeR":"bioconductor-edger",
+        "flashClust":"r-flashclust",
+        "gcrma":"bioconductor-gcrma",
+        "ggplot2":"r-ggplot2",
+        "gplots":"r-gplots",
+        "gridExtra":"r-gridextra",
+        "grid":"r-gridbase",
+        "gtools":"r-gtools",
+        "hpar":"bioconductor-hpar",
+        "knitr":"r-knitr",
+        "limma":"bioconductor-limma",
+        "maSigPro":"bioconductor-masigpro",
+    }
+
+In this case the dictionary key is the name in `library(name)` and the value is the name of the conda package.
+
+Please open a pull request if you want new R dependencies to be added to **r_deps.json**
 
 # Related tools
 
