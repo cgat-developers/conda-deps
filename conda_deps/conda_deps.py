@@ -364,8 +364,13 @@ def main(argv=None):
                         action="append",
                         default=[])
     parser.add_argument(
-        "--include-json",
-        help="Path to a json file with project specific translations",
+        "--include-py-json",
+        help="Path to a json file with project specific translations for Python",
+        action="append",
+        default=[])
+    parser.add_argument(
+        "--include-r-json",
+        help="Path to a json file with project specific translations for R",
         action="append",
         default=[])
     parser.add_argument(
@@ -384,8 +389,12 @@ def main(argv=None):
     PY_LOCAL = get_local_imports(options.filename)
 
     # update default translation dict with project specific ones
-    for j in options.include_json:
+    for j in options.include_py_json:
         PY_DEPS.update(json.load(open(j)))
+
+    # update default translation dict with project specific ones
+    for j in options.include_r_json:
+        R_DEPS.update(json.load(open(j)))
 
     # get dependencies
     (python_deps, r_deps) = check_deps(options.filename, list(
