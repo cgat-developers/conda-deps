@@ -2,4 +2,4 @@
 # Include the following files
 include LICENSE
 include conda_deps/python_deps.json
-
+include conda_deps/r_deps.json
