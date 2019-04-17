@@ -9,7 +9,7 @@ but it would be great to have it working for other programming languages as well
     import numpy
     import scipy
 
-into a conda environment yaml file:
+into an environment file:
 
     name: testenv
     
@@ -76,7 +76,7 @@ In case you want to exclude one or more subfolders, use the `--exclude-folder` o
 
 You may also want to scan additonal files of folders:
 
-    python conda_deps.py </path/to/folder> --include-files my-script.py --include-files </another/folder>
+    conda_deps </path/to/folder> --include-files my-script.py --include-files </another/folder>
     
 # How it works
 
