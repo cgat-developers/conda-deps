@@ -159,3 +159,10 @@ Please note that the translations in **my_project.json** will take priority over
 * http://bit.ly/2rDf5xu
 * http://bit.ly/2r0Uv9t
 * https://github.com/titusjan/astviewer
+
+# Changelog
+
+* v0.0.5: Added **r_deps.json** to manifest file.
+* v0.0.4: translate R dependencies. Not uploaded to conda-forge due to missing **r_deps.json** in the manifest file.
+* v0.0.3: minor bugfixes
+* v0.0.2: first working version uploaded to conda-forge
