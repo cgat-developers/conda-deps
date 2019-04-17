@@ -40,7 +40,7 @@ else:
 if len(r_deps_folder) == 0:
     R_DEPS = json.load(open('r_deps.json'))
 else:
-    R_DEPS = json.load(open('{}/r_deps.json'.format(py_deps_folder)))
+    R_DEPS = json.load(open('{}/r_deps.json'.format(r_deps_folder)))
 
 
 def config_logging(debug):
