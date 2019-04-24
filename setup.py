@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="conda_deps",
-    version="0.0.5",
+    version="0.0.6",
     author="cgat-developers",
     author_email="sebastian.luna.valero@gmail.com",
     description="Generate conda environment files from Python source code",

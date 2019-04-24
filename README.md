@@ -162,7 +162,7 @@ Please note that the translations in **my_project.json** will take priority over
 
 # Changelog
 
-* v0.0.6: to be released
+* v0.0.6:
   - added sanity check for dependency translation
   - [improve regex to translate Bioconductor dependencies](https://github.com/cgat-developers/conda-deps/pull/3)
 * v0.0.5: Added **r_deps.json** to manifest file. The option **--include-py-files** has been renamed to **--include-files**.
