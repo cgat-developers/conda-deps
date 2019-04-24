@@ -336,6 +336,7 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
             first = False
         # add sanity check for suspicious dependencies
         # e.g. all conda dependencies are always lowercase
+        # ref: https://bit.ly/2ITl1dS
         if any(c.isupper() for c in d):
             print(" - {} # is this valid?".format(d))
         else:
@@ -350,8 +351,9 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
         # e.g. all conda dependencies are always lowercase
         # R deps always start with the "r-" prefix
         # Bioconductor deps always start with the "bioconductor-" prefix
-        if any(c.isupper() for c in d) or
-            not d.startswith("r-") or
+        # ref: https://bit.ly/2ITl1dS
+        if any(c.isupper() for c in d) or \
+            not d.startswith("r-") or \
             not d.startswith("bioconductor-"):
             print(" - {} # is this valid?".format(d))
         else:
