@@ -353,8 +353,8 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
         # Bioconductor deps always start with the "bioconductor-" prefix
         # ref: https://bit.ly/2ITl1dS
         if any(c.isupper() for c in d) or \
-            not d.startswith("r-") or \
-            not d.startswith("bioconductor-"):
+            (not d.startswith("r-") and \
+             not d.startswith("bioconductor-")):
             print(" - {} # is this valid?".format(d))
         else:
             print(" - {}".format(d))
