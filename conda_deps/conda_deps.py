@@ -244,7 +244,7 @@ def scan_r_imports(filename):
     with open(filename) as f:
         data = f.read()
 
-    results = re.findall(r"library\((\W*)([\w,.]+)(\W*)\)", data)
+    results = re.findall(r"library\((\W*)([\w\.]+)(\W*)\)", data)
 
     for r in results:
         # the result of re.findall is a list of tuples where
