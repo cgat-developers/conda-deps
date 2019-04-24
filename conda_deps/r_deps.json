@@ -1,4 +1,6 @@
 {
+"BSgenome.Hsapiens.UCSC.hg19":"bioconductor-bsgenome.hsapiens.ucsc.hg19",
+"ATACseqQC":"bioconductor-atacseqqc",
 "BiSeq":"bioconductor-biseq",
 "Biobase":"bioconductor-biobase",
 "ChIPQC":"bioconductor-chipqc",
