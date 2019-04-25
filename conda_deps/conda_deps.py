@@ -95,7 +95,7 @@ def is_python_std(name):
 
     result = False
 
-    #python_path = os.path.dirname(sys.executable)
+    python_path = os.path.dirname(sys.executable)
     module_path = None
 
     try:
@@ -104,7 +104,7 @@ def is_python_std(name):
         pass
 
     logging.debug('Module Name: {}'.format(name))
-    #logging.debug('Python Path: {}'.format(python_path))
+    logging.debug('Python Path: {}'.format(python_path))
     logging.debug('Module Path: {}'.format(module_path))
 
     if module_path is not None:
