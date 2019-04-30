@@ -162,6 +162,9 @@ Please note that the translations in **my_project.json** will take priority over
 
 # Changelog
 
+* v0.0.7:
+  - improve the test to check whether a module belongs to the Python Standard Library
+  - add new R dependencies to the json dictionary
 * v0.0.6:
   - Add sanity check for dependency translation
   - [Improve regex to translate Bioconductor dependencies](https://github.com/cgat-developers/conda-deps/pull/3)
