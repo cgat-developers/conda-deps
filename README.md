@@ -163,9 +163,13 @@ Please note that the translations in **my_project.json** will take priority over
 # Changelog
 
 * v0.0.6:
-  - added sanity check for dependency translation
-  - [improve regex to translate Bioconductor dependencies](https://github.com/cgat-developers/conda-deps/pull/3)
-* v0.0.5: Added **r_deps.json** to manifest file. The option **--include-py-files** has been renamed to **--include-files**.
-* v0.0.4: translate R dependencies. Not uploaded to conda-forge due to missing **r_deps.json** in the manifest file.
+  - Add sanity check for dependency translation
+  - [Improve regex to translate Bioconductor dependencies](https://github.com/cgat-developers/conda-deps/pull/3)
+* v0.0.5:
+  - Add **r_deps.json** to manifest file
+  - Rename option **--include-py-files** to **--include-files**
+* v0.0.4: 
+  - Add translation of R dependencies
+  - Not uploaded to conda-forge due to missing **r_deps.json** in the manifest file
 * v0.0.3: minor bugfixes.
 * v0.0.2: first working version uploaded to conda-forge.
