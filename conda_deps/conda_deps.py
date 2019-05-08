@@ -289,17 +289,17 @@ def check_deps(filename, exclude_folder):
                 if f.endswith(".py"):
                     scan_python.append(os.path.join(dirpath, f))
                     scan_r.append(os.path.join(dirpath, f))
-                elif f.endswith(".R"):
+                elif f.endswith(".R") or f.endswith(".Rmd"):
                     scan_r.append(os.path.join(dirpath, f))
     else:
         # case of single file
         if filename.endswith(".py"):
             scan_python.append(filename)
             scan_r.append(filename)
-        elif filename.endswith(".R"):
+        elif filename.endswith(".R") or filename.endswith(".Rmd"):
             scan_r.append(filename)
         else:
-            logging.warning("Unrecognized file format. Expected files ending in .py or .R".format(filename))
+            logging.warning("Unrecognized file format. Expected files ending in: .py, .R, and .Rmd".format(filename))
 
     # set of dependencies
     python_deps = set()

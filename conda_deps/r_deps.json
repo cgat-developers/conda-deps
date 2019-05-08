@@ -66,5 +66,6 @@
 "stringr":"r-stringr",
 "vegan":"r-vegan",
 "wasabi":"r-wasabi",
+"yaml":"r-yaml",
 "zinba":"ignore"
 }    
