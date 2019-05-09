@@ -19,6 +19,8 @@ import ast
 import argparse
 import json
 import logging
+import nbformat
+from nbconvert import PythonExporter
 
 # modules part of the Python Standard Library
 PY_STD = {'sys',
@@ -211,6 +213,45 @@ def scan_python_imports(filename):
     return deps
 
 
+def scan_jupyter_imports(filename):
+    '''
+       Auxiliary function to get Python imports from Jupyter notebooks
+    '''
+    # check input is correct
+    if not os.access(filename, os.R_OK):
+        raise IOError("File {} can't be read\n".format(filename))
+
+    logging.debug('Python scan for file: {}'.format(filename))
+
+    deps = set()
+
+    try:
+
+        # https://nbformat.readthedocs.io/en/latest/api.html
+        ipynb = nbformat.read(filename, as_version=nbformat.NO_CONVERT)
+        # https://nbconvert.readthedocs.io/en/latest/nbconvert_library.html
+        python_exporter = PythonExporter()
+        (body, resources) = python_exporter.from_notebook_node(ipynb)
+
+        tree = ast.parse(body)
+
+        for node in ast.walk(tree):
+            module = is_import(node)
+            if module is not None and not is_python_std(module):
+                orig_module = cleanup_import(module)
+                tran_module = translate_python_import(orig_module)
+                if tran_module != "ignore" and tran_module not in PY_LOCAL:
+                    deps.add(tran_module)
+                    logging.debug('Translating Python dependency {} into {}'.format(orig_module, tran_module))
+                else:
+                    logging.debug('Ignoring Python dependency: {}'.format(orig_module))
+
+    except BaseException:
+        logging.warning("Could not parse file: {}".format(filename))
+
+    return deps
+
+
 def translate_r_library(name):
     '''
        Auxiliary function to translate the module name
@@ -276,6 +317,7 @@ def check_deps(filename, exclude_folder):
     # list of files to scan
     scan_python = []
     scan_r = []
+    scan_jupyter = []
 
     if os.path.isdir(filename):
         # scan all python files in the folder
@@ -291,6 +333,8 @@ def check_deps(filename, exclude_folder):
                     scan_r.append(os.path.join(dirpath, f))
                 elif f.endswith(".R") or f.endswith(".Rmd"):
                     scan_r.append(os.path.join(dirpath, f))
+                elif f.endswith(".ipynb"):
+                    scan_jupyter.append(os.path.join(dirpath, f))
     else:
         # case of single file
         if filename.endswith(".py"):
@@ -298,8 +342,10 @@ def check_deps(filename, exclude_folder):
             scan_r.append(filename)
         elif filename.endswith(".R") or filename.endswith(".Rmd"):
             scan_r.append(filename)
+        elif filename.endswith(".ipynb"):
+            scan_jupyter.append(filename)
         else:
-            logging.warning("Unrecognized file format. Expected files ending in: .py, .R, and .Rmd".format(filename))
+            logging.warning("Unrecognized file format. Expected files ending in: .py, .ipynb, .R, and .Rmd".format(filename))
 
     # set of dependencies
     python_deps = set()
@@ -311,6 +357,9 @@ def check_deps(filename, exclude_folder):
 
     for f in scan_r:
         r_deps.update(scan_r_imports(f))
+
+    for f in scan_jupyter:
+        python_deps.update(scan_jupyter_imports(f))
 
     return python_deps, r_deps
 
