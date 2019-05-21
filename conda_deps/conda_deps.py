@@ -335,6 +335,7 @@ def check_deps(filename, exclude_folder):
                     scan_r.append(os.path.join(dirpath, f))
                 elif f.endswith(".ipynb"):
                     scan_jupyter.append(os.path.join(dirpath, f))
+                    scan_r.append(os.path.join(dirpath, f))
     else:
         # case of single file
         if filename.endswith(".py"):
@@ -344,6 +345,7 @@ def check_deps(filename, exclude_folder):
             scan_r.append(filename)
         elif filename.endswith(".ipynb"):
             scan_jupyter.append(filename)
+            scan_r.append(filename)
         else:
             logging.warning("Unrecognized file format. Expected files ending in: .py, .ipynb, .R, and .Rmd".format(filename))
 
