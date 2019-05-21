@@ -162,9 +162,11 @@ Please note that the translations in **my_project.json** will take priority over
 
 # Changelog
 
-* v0.0.8:
+* v0.0.9:
   - Scan **.Rmd** and **.ipynb** files as well
-  - Therefore, **ipython** and **nbconvert** had to be added as dependencies
+  - Therefore, **nbconvert** had to be added as dependencies
+* v0.0.8:
+  - [Add new R dependencies](https://github.com/cgat-developers/conda-deps/pull/6)
 * v0.0.7:
   - Improve the test to check whether a module belongs to the Python Standard Library
   - Add new R dependencies to the json dictionary
