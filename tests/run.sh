@@ -66,7 +66,7 @@ ALL=`ls tests/*.py | head -1`
 for f in `ls tests/*py*` ;
 do
     ALL=$ALL" --include-files "$f
-    env_f=`echo $f | sed 's/.*py*/.yml/g'`
+    env_f=`echo $f | sed 's/.ipynb/.yml/g' | sed 's/.py/.yml/g'`
     log " Comparing: conda_deps $f"
     log " with: $env_f"
     conda_deps --debug $f
