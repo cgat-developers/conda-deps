@@ -4,4 +4,4 @@ name: test
 dependencies:
  - python
  - nbconvert
-
+ - ipython
