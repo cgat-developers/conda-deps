@@ -68,18 +68,22 @@ def is_import(node):
        a .py file
     '''
 
-    result = None
+    results = None
 
     if isinstance(node, ast.Import) and \
             hasattr(node, 'names') and \
-            hasattr(node.names[0], 'name'):
-        result = node.names[0].name
+            isinstance(node.names, list):
+
+        results = []
+        for n in node.names:
+            results.append(n.name)
 
     elif isinstance(node, ast.ImportFrom) and \
             hasattr(node, 'module'):
-        result = node.module
 
-    return result
+        results = [node.module]
+
+    return results
 
 
 # References:
@@ -197,15 +201,17 @@ def scan_python_imports(filename):
         # really helpful, used astviewer (installed in a conda-env) to inspect examples
         # https://github.com/titusjan/astviewer
         for node in ast.walk(tree):
-            module = is_import(node)
-            if module is not None and not is_python_std(module):
-                orig_module = cleanup_import(module)
-                tran_module = translate_python_import(orig_module)
-                if tran_module != "ignore" and tran_module not in PY_LOCAL:
-                    deps.add(tran_module)
-                    logging.debug('Translating Python dependency {} into {}'.format(orig_module, tran_module))
-                else:
-                    logging.debug('Ignoring Python dependency: {}'.format(orig_module))
+            modules = is_import(node)
+            if modules is not None:
+                for m in modules:
+                    if not is_python_std(m):
+                        orig = cleanup_import(m)
+                        tran = translate_python_import(orig)
+                        if tran != "ignore" and tran not in PY_LOCAL:
+                            deps.add(tran)
+                            logging.debug('Translating Python dependency {} into {}'.format(orig, tran))
+                        else:
+                            logging.debug('Ignoring Python dependency: {}'.format(orig))
 
     except BaseException:
         logging.warning("Could not parse file: {}".format(filename))
