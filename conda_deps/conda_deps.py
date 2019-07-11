@@ -311,6 +311,48 @@ def scan_r_imports(filename):
 
     return deps
 
+def scan_jupyter_magics(filename):
+    '''
+       Auxiliary function to scan Jupyter magics:
+       https://ipython.readthedocs.io/en/stable/config/extensions/#extensions-bundled-with-ipython
+
+       Warning: we are only interested in:
+       * %load_ext rpy2.ipython
+       * %load_ext Cython
+    '''
+
+    deps = set()
+
+    filtered = ""
+
+    # filter out lines with comments (#)
+    with open(filename) as f:
+        for l in f:
+            hash_pos = l.find('#')
+            load_pos = l.find('%')
+            if hash_pos != -1:
+                # there is a # in this line, need to check where
+                if hash_pos > load_pos:
+                    # means that we have something like: %load_ext bla # comment
+                    # therefore scan it
+                    filtered += l
+                # otherwise:
+                # means that we have something like: #%load_ext
+                # therefore, we filter this line
+            else:
+                # there is no # in this line, therefore scan it
+                filtered += l
+
+    results = re.findall(r"%load_ext rpy2.ipython", filtered)
+    if len(results) > 0:
+        deps.add('rpy2')
+
+    results = re.findall(r"%load_ext Cython", filtered)
+    if len(results) > 0:
+        deps.add('cython')
+
+    return deps
+
 
 def check_deps(filename, exclude_folder):
     '''
@@ -326,6 +368,7 @@ def check_deps(filename, exclude_folder):
     scan_python = []
     scan_r = []
     scan_jupyter = []
+    jupyter_magics = []
 
     if os.path.isdir(filename):
         # scan all python files in the folder
@@ -343,6 +386,7 @@ def check_deps(filename, exclude_folder):
                     scan_r.append(os.path.join(dirpath, f))
                 elif f.endswith(".ipynb"):
                     scan_jupyter.append(os.path.join(dirpath, f))
+                    jupyter_magics.append(os.path.join(dirpath, f))
                     scan_r.append(os.path.join(dirpath, f))
     else:
         # case of single file
@@ -353,6 +397,7 @@ def check_deps(filename, exclude_folder):
             scan_r.append(filename)
         elif filename.endswith(".ipynb"):
             scan_jupyter.append(filename)
+            jupyter_magics.append(filename)
             scan_r.append(filename)
         else:
             logging.warning("Unrecognized file format. Expected files ending in: .py, .ipynb, .R, and .Rmd".format(filename))
@@ -370,6 +415,9 @@ def check_deps(filename, exclude_folder):
 
     for f in scan_jupyter:
         python_deps.update(scan_jupyter_imports(f))
+
+    for f in jupyter_magics:
+        python_deps.update(scan_jupyter_magics(f))
 
     return python_deps, r_deps
 
