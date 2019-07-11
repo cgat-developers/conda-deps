@@ -13,5 +13,6 @@ dependencies:
  - matplotlib
  - numpy
  - pandas
+ - rpy2
  - r-base
  - r-reshape2
