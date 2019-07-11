@@ -42,6 +42,10 @@ into:
     - r-reshape2    
     - r-ggplot2
 
+## Warning
+
+Please note that `conda_deps` does not check dependencies in a clever way. For example, if your code imports `scipy` and `numpy`, the script will generate an environment with both listed even though `numpy` **is** a dependency of `scipy` and only the latter would be required. So the expected output of `conda_deps` is a direct translation of the dependencies found in your code.
+
 # Installation
 
 `conda_deps` only works in **Python 3** and will only scan properly **Python 3** source code.
@@ -148,6 +152,10 @@ in your own json file:
     
 Please note that the translations in **my_project.json** will take priority over those in **r_deps.json**.
 
+## Warning
+
+An important point to bear in mind is that the translations for both Python and R are not comprehensive and are mainly based in the dependencies used in the past. It will be a matter of time to keep adding new dependencies to the json files in charge of the translation. This implies that the environment file produced as output may not be valid straight away and conda will complain about that when creating the environment (i.e. error message: **PackagesNotFoundError**).
+
 # Related tools
 
 * [snakefood](http://furius.ca/snakefood/): a more comprehensive tool but it works only with Python 2.
@@ -162,6 +170,11 @@ Please note that the translations in **my_project.json** will take priority over
 
 # Changelog
 
+* v0.0.9:
+  - Scan **.Rmd** and **.ipynb** files as well, therefore the script now depends on **nbconvert**
+  - Able to scan Python imports with multiple modules (e.g. `import numpy, matplotlib`)
+  - Add new R dependencies to the json dictionary
+  - Scan `rmagic` and `cythonmagic` in **.ipynb** files ([#1](https://github.com/cgat-developers/conda-deps/issues/1))
 * v0.0.8:
   - [Add new R dependencies](https://github.com/cgat-developers/conda-deps/pull/6)
 * v0.0.7:

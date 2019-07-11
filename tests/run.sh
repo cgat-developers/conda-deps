@@ -63,14 +63,14 @@ report_error() {
 
 # scan all python files in test folder
 ALL=`ls tests/*.py | head -1`
-for f in `ls tests/*.py` ;
+for f in `ls tests/*py*` ;
 do
     ALL=$ALL" --include-files "$f
-    env_f=`echo $f | sed 's/.py/.yml/g'`
-    log " Comparing: python3 conda_deps.py $f"
+    env_f=`echo $f | sed 's/.ipynb/.yml/g' | sed 's/.py/.yml/g'`
+    log " Comparing: conda_deps $f"
     log " with: $env_f"
-    python3 conda_deps/conda_deps.py --debug $f
-    diff <(python3 conda_deps/conda_deps.py $f) <(cat $env_f)
+    conda_deps --debug $f
+    diff <(conda_deps $f) <(cat $env_f)
     if [[ "$?" -eq "0" ]] ; then
         log " Test succeeded for: $f!"
     else
@@ -78,9 +78,9 @@ do
     fi
 done
 
-log " Scanning all: python3 conda_deps.py $ALL"
-python3 conda_deps/conda_deps.py --debug $ALL
-diff <(python3 conda_deps/conda_deps.py $ALL) <(cat tests/all.yml)
+log " Scanning all: conda_deps $ALL"
+conda_deps --debug $ALL
+diff <(conda_deps $ALL) <(cat tests/all.yml)
 if [[ "$?" -eq "0" ]] ; then
     log " Test succeeded for all files together!"
 else

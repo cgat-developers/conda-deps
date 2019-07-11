@@ -19,6 +19,8 @@ import ast
 import argparse
 import json
 import logging
+import nbformat
+from nbconvert import PythonExporter
 
 # modules part of the Python Standard Library
 PY_STD = {'sys',
@@ -66,18 +68,22 @@ def is_import(node):
        a .py file
     '''
 
-    result = None
+    results = None
 
     if isinstance(node, ast.Import) and \
             hasattr(node, 'names') and \
-            hasattr(node.names[0], 'name'):
-        result = node.names[0].name
+            isinstance(node.names, list):
+
+        results = []
+        for n in node.names:
+            results.append(n.name)
 
     elif isinstance(node, ast.ImportFrom) and \
             hasattr(node, 'module'):
-        result = node.module
 
-    return result
+        results = [node.module]
+
+    return results
 
 
 # References:
@@ -195,15 +201,58 @@ def scan_python_imports(filename):
         # really helpful, used astviewer (installed in a conda-env) to inspect examples
         # https://github.com/titusjan/astviewer
         for node in ast.walk(tree):
-            module = is_import(node)
-            if module is not None and not is_python_std(module):
-                orig_module = cleanup_import(module)
-                tran_module = translate_python_import(orig_module)
-                if tran_module != "ignore" and tran_module not in PY_LOCAL:
-                    deps.add(tran_module)
-                    logging.debug('Translating Python dependency {} into {}'.format(orig_module, tran_module))
-                else:
-                    logging.debug('Ignoring Python dependency: {}'.format(orig_module))
+            modules = is_import(node)
+            if modules is not None:
+                for m in modules:
+                    if not is_python_std(m):
+                        orig = cleanup_import(m)
+                        tran = translate_python_import(orig)
+                        if tran != "ignore" and tran not in PY_LOCAL:
+                            deps.add(tran)
+                            logging.debug('Translating Python dependency {} into {}'.format(orig, tran))
+                        else:
+                            logging.debug('Ignoring Python dependency: {}'.format(orig))
+
+    except BaseException:
+        logging.warning("Could not parse file: {}".format(filename))
+
+    return deps
+
+
+def scan_jupyter_imports(filename):
+    '''
+       Auxiliary function to get Python imports from Jupyter notebooks
+    '''
+    # check input is correct
+    if not os.access(filename, os.R_OK):
+        raise IOError("File {} can't be read\n".format(filename))
+
+    logging.debug('Python scan for file: {}'.format(filename))
+
+    deps = set()
+
+    try:
+
+        # https://nbformat.readthedocs.io/en/latest/api.html
+        ipynb = nbformat.read(filename, as_version=nbformat.NO_CONVERT)
+        # https://nbconvert.readthedocs.io/en/latest/nbconvert_library.html
+        python_exporter = PythonExporter()
+        (body, resources) = python_exporter.from_notebook_node(ipynb)
+
+        tree = ast.parse(body)
+
+        for node in ast.walk(tree):
+            modules = is_import(node)
+            if modules is not None:
+                for m in modules:
+                    if not is_python_std(m):
+                        orig = cleanup_import(m)
+                        tran = translate_python_import(orig)
+                        if tran != "ignore" and tran not in PY_LOCAL:
+                            deps.add(tran)
+                            logging.debug('Translating Python dependency {} into {}'.format(orig, tran))
+                        else:
+                            logging.debug('Ignoring Python dependency: {}'.format(orig))
 
     except BaseException:
         logging.warning("Could not parse file: {}".format(filename))
@@ -262,6 +311,48 @@ def scan_r_imports(filename):
 
     return deps
 
+def scan_jupyter_magics(filename):
+    '''
+       Auxiliary function to scan Jupyter magics:
+       https://ipython.readthedocs.io/en/stable/config/extensions/#extensions-bundled-with-ipython
+
+       Warning: we are only interested in:
+       * %load_ext rpy2.ipython
+       * %load_ext Cython
+    '''
+
+    deps = set()
+
+    filtered = ""
+
+    # filter out lines with comments (#)
+    with open(filename) as f:
+        for l in f:
+            hash_pos = l.find('#')
+            load_pos = l.find('%')
+            if hash_pos != -1:
+                # there is a # in this line, need to check where
+                if hash_pos > load_pos:
+                    # means that we have something like: %load_ext bla # comment
+                    # therefore scan it
+                    filtered += l
+                # otherwise:
+                # means that we have something like: #%load_ext
+                # therefore, we filter this line
+            else:
+                # there is no # in this line, therefore scan it
+                filtered += l
+
+    results = re.findall(r"%load_ext rpy2.ipython", filtered)
+    if len(results) > 0:
+        deps.add('rpy2')
+
+    results = re.findall(r"%load_ext Cython", filtered)
+    if len(results) > 0:
+        deps.add('cython')
+
+    return deps
+
 
 def check_deps(filename, exclude_folder):
     '''
@@ -276,6 +367,8 @@ def check_deps(filename, exclude_folder):
     # list of files to scan
     scan_python = []
     scan_r = []
+    scan_jupyter = []
+    jupyter_magics = []
 
     if os.path.isdir(filename):
         # scan all python files in the folder
@@ -289,17 +382,25 @@ def check_deps(filename, exclude_folder):
                 if f.endswith(".py"):
                     scan_python.append(os.path.join(dirpath, f))
                     scan_r.append(os.path.join(dirpath, f))
-                elif f.endswith(".R"):
+                elif f.endswith(".R") or f.endswith(".Rmd"):
+                    scan_r.append(os.path.join(dirpath, f))
+                elif f.endswith(".ipynb"):
+                    scan_jupyter.append(os.path.join(dirpath, f))
+                    jupyter_magics.append(os.path.join(dirpath, f))
                     scan_r.append(os.path.join(dirpath, f))
     else:
         # case of single file
         if filename.endswith(".py"):
             scan_python.append(filename)
             scan_r.append(filename)
-        elif filename.endswith(".R"):
+        elif filename.endswith(".R") or filename.endswith(".Rmd"):
+            scan_r.append(filename)
+        elif filename.endswith(".ipynb"):
+            scan_jupyter.append(filename)
+            jupyter_magics.append(filename)
             scan_r.append(filename)
         else:
-            logging.warning("Unrecognized file format. Expected files ending in .py or .R".format(filename))
+            logging.warning("Unrecognized file format. Expected files ending in: .py, .ipynb, .R, and .Rmd".format(filename))
 
     # set of dependencies
     python_deps = set()
@@ -311,6 +412,12 @@ def check_deps(filename, exclude_folder):
 
     for f in scan_r:
         r_deps.update(scan_r_imports(f))
+
+    for f in scan_jupyter:
+        python_deps.update(scan_jupyter_imports(f))
+
+    for f in jupyter_magics:
+        python_deps.update(scan_jupyter_magics(f))
 
     return python_deps, r_deps
 

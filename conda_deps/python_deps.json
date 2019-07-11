@@ -1,6 +1,7 @@
 {
 "Bio":"biopython",
 "Cython":"cython",
+"IPython":"ipython",
 "MySQLdb":"mysqlclient",
 "SphinxReport":"ignore",
 "alignlib_lite":"alignlib-lite",

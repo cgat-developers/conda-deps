@@ -8,23 +8,11 @@ channels:
 
 dependencies:
  - python
- - cgat-apps
  - cgatcore
- - cgatpipelines
  - ipython
  - matplotlib
  - numpy
  - pandas
- - pysam
- - python-lzo
- - pyyaml
  - rpy2
- - ruffus
- - scipy
- - seaborn
  - r-base
- - r-ggplot2
- - r-gmd
- - r-hmisc
- - r-rcolorbrewer
  - r-reshape2
