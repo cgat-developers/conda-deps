@@ -21,6 +21,7 @@ import json
 import logging
 import nbformat
 from nbconvert import PythonExporter
+from cgat_check_deps import scanCgatDeps
 
 # modules part of the Python Standard Library
 PY_STD = {'sys',
@@ -43,6 +44,13 @@ if len(r_deps_folder) == 0:
     R_DEPS = json.load(open('r_deps.json'))
 else:
     R_DEPS = json.load(open('{}/r_deps.json'.format(r_deps_folder)))
+
+# load translations for other deps from default json file
+(misc_deps_folder, misc_deps_file) = os.path.split(__file__)
+if len(misc_deps_folder) == 0:
+    MISC_DEPS = json.load(open('misc_deps.json'))
+else:
+    MISC_DEPS = json.load(open('{}/misc_deps.json'.format(misc_deps_folder)))
 
 
 def config_logging(debug):
@@ -311,6 +319,7 @@ def scan_r_imports(filename):
 
     return deps
 
+
 def scan_jupyter_magics(filename):
     '''
        Auxiliary function to scan Jupyter magics:
@@ -354,6 +363,41 @@ def scan_jupyter_magics(filename):
     return deps
 
 
+def translate_misc_deps(input_deps):
+    '''
+       Auxiliary function to translate command-line programs
+       into its conda package (e.g. wigToBigWig -> ucsc-wigtobigwig)
+
+       The translation is performed by loading the "misc_deps.json" file
+       into a Python dictionary where the key is the name
+       of the command-line program and the value is the name
+       of the conda package.
+
+       Contrary to the translations with Python and R, we do not assume
+       here that by default a package will be available in conda since
+       it is much harder to find those packages available in conda.
+
+       misc_deps.json will be growing over time as we find new conda
+       packages into the repositories.
+    '''
+
+    result = set()
+    unknown = set()
+
+    for k in input_deps:
+        tran = MISC_DEPS.get(k, "n/a")
+        if tran == 'n/a':
+            logging.debug(' Misc dep: {} is unknown and has been ignored'.format(k))
+            unknown.add(k)
+        elif tran == 'ignore':
+            logging.debug(' Misc dep: {} has been ignored'.format(k))
+        else:
+            logging.debug(' Misc dep: {} translated into: {}'.format(k, tran))
+            result.add(tran)
+
+    return result, unknown
+
+
 def check_deps(filename, exclude_folder):
     '''
        Auxiliary function to detect whether input is a file or a folder
@@ -369,6 +413,7 @@ def check_deps(filename, exclude_folder):
     scan_r = []
     scan_jupyter = []
     jupyter_magics = []
+    scan_cgat = []
 
     if os.path.isdir(filename):
         # scan all python files in the folder
@@ -405,10 +450,15 @@ def check_deps(filename, exclude_folder):
     # set of dependencies
     python_deps = set()
     r_deps = set()
+    cgat_deps = set()
+    cgat_unknown = set()
 
     # scan all files
     for f in scan_python:
-        python_deps.update(scan_python_imports(f))
+        tmp_deps = scan_python_imports(f)
+        python_deps.update(tmp_deps)
+        if 'cgatcore' in tmp_deps:
+            scan_cgat.append(f)
 
     for f in scan_r:
         r_deps.update(scan_r_imports(f))
@@ -419,10 +469,15 @@ def check_deps(filename, exclude_folder):
     for f in jupyter_magics:
         python_deps.update(scan_jupyter_magics(f))
 
-    return python_deps, r_deps
+    for f in scan_cgat:
+        (deps_cgat, deps_cgat_unknown) = translate_misc_deps(scanCgatDeps(f))
+        cgat_deps.update(deps_cgat)
+        cgat_unknown.update(deps_cgat_unknown)
+
+    return python_deps, r_deps, cgat_deps, cgat_unknown
 
 
-def print_conda_env(python_deps, r_deps, envname="myenv",
+def print_conda_env(python_deps, r_deps, cgat_deps, cgat_unknown, envname="myenv",
                     envchannels=["conda-forge", "bioconda", "defaults"]):
     '''
        Print conda environment file
@@ -468,6 +523,21 @@ def print_conda_env(python_deps, r_deps, envname="myenv",
             print(" - {} # is this valid?".format(d))
         else:
             print(" - {}".format(d))
+
+    for d in sorted(cgat_deps):
+        # ref: https://bit.ly/2ITl1dS
+        if any(c.isupper() for c in d):
+            print(" - {} # is this valid?".format(d))
+        else:
+            print(" - {}".format(d))
+
+    first = True
+    for d in sorted(cgat_unknown):
+        if first:
+            print(" # we don't know how to translate the deps below")
+            print(" # if they are valid please add them to misc_deps.json")
+            first = False
+        print(" # - {}".format(d))
 
 
 def main(argv=None):
@@ -525,18 +595,20 @@ def main(argv=None):
         R_DEPS.update(json.load(open(j)))
 
     # get dependencies
-    (python_deps, r_deps) = check_deps(options.filename, list(
-        map(os.path.abspath, options.exclude_folder)))
+    (python_deps, r_deps, cgat_deps, cgat_unknown) = check_deps(options.filename,
+        list(map(os.path.abspath, options.exclude_folder)))
 
     # scan additional dependencies
     for f in options.include_files:
-        (deps_py, deps_r) = check_deps(f, list(
+        (deps_py, deps_r, deps_cgat, deps_cgat_unknown) = check_deps(f, list(
             map(os.path.abspath, options.exclude_folder)))
         python_deps.update(deps_py)
         r_deps.update(deps_r)
+        cgat_deps.update(deps_cgat)
+        cgat_unknown.update(deps_cgat_unknown)
 
     # print info about dependencies
-    print_conda_env(python_deps, r_deps)
+    print_conda_env(python_deps, r_deps, cgat_deps, cgat_unknown)
 
 
 if __name__ == "__main__":

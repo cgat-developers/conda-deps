@@ -3,3 +3,5 @@
 include LICENSE
 include conda_deps/python_deps.json
 include conda_deps/r_deps.json
+include conda_deps/cgat_check_deps.py
+include conda_deps/misc_deps.json
