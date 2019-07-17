@@ -1,6 +1,11 @@
 
 name: test
 
+channels:
+- conda-forge
+- bioconda
+- defaults
+
 dependencies:
  - python
  - nbconvert
