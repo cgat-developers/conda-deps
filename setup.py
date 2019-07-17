@@ -17,7 +17,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/cgat-developers/conda-deps",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_namespace_packages(),
     entry_points = {
         'console_scripts': ['conda_deps=conda_deps.conda_deps:main'],
     },
