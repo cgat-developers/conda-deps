@@ -13,7 +13,6 @@ install:
   - conda env create -f environment.yml 
   - conda activate test
   - python setup.py install
-  - ls -lhR
 
 script:
   - bash tests/run.sh
