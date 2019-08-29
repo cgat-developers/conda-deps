@@ -21,7 +21,7 @@ import json
 import logging
 import nbformat
 from nbconvert import PythonExporter
-from cgat_check_deps import scanCgatDeps
+from conda_deps.cgat_check_deps import scanCgatDeps
 
 # modules part of the Python Standard Library
 PY_STD = {'sys',
