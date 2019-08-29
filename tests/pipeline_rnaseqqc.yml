@@ -7,6 +7,7 @@ channels:
  - defaults
 
 dependencies:
+# Python deps
  - python
  - cgat-apps
  - cgatcore
@@ -18,9 +19,17 @@ dependencies:
  - ruffus
  - scipy
  - seaborn
+# R deps
  - r-base
  - r-ggplot2
  - r-gmd
  - r-hmisc
  - r-rcolorbrewer
  - r-reshape2
+# Misc deps
+ - coreutils
+ - gawk
+ - htslib
+ - sailfish
+ - salmon
+ - ucsc-gtftogenepred

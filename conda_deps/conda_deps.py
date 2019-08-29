@@ -492,11 +492,14 @@ def print_conda_env(python_deps, r_deps, cgat_deps, cgat_unknown, envname="myenv
     print("\nchannels:")
     for c in envchannels:
         print(" - {}".format(c))
+
     print("\ndependencies:")
+
     first = True
     for d in sorted(python_deps):
         # make sure Python is listed as a dependency
         if first:
+            print("# Python deps")
             print(" - python")
             first = False
         # add sanity check for suspicious dependencies
@@ -506,10 +509,12 @@ def print_conda_env(python_deps, r_deps, cgat_deps, cgat_unknown, envname="myenv
             print(" - {} # is this valid?".format(d))
         else:
             print(" - {}".format(d))
+
     first = True
     for d in sorted(r_deps):
         # make sure R is listed as a dependency
         if first:
+            print("# R deps")
             print(" - r-base")
             first = False
         # add sanity check for suspicious dependencies
@@ -524,10 +529,18 @@ def print_conda_env(python_deps, r_deps, cgat_deps, cgat_unknown, envname="myenv
         else:
             print(" - {}".format(d))
 
+    first = True
     for d in sorted(cgat_deps):
+        if first:
+            print("# Misc deps")
+            first = False
         # ref: https://bit.ly/2ITl1dS
         if any(c.isupper() for c in d):
             print(" - {} # is this valid?".format(d))
+        # cgat deps may appear in both the python and misc sections
+        # we include this here to avoid duplicating them in the final env
+        elif d in python_deps:
+            pass
         else:
             print(" - {}".format(d))
 
