@@ -42,9 +42,11 @@ into:
     - r-reshape2    
     - r-ggplot2
 
-## Warning
+## Warnings
 
-Please note that `conda_deps` does not check dependencies in a clever way. For example, if your code imports `scipy` and `numpy`, the script will generate an environment with both listed even though `numpy` **is** a dependency of `scipy` and only the latter would be required. So the expected output of `conda_deps` is a direct translation of the dependencies found in your code.
+* Please note that `conda_deps` does not check dependencies in a clever way. For example, if your code imports `scipy` and `numpy`, the script will generate an environment with both listed even though `numpy` **is** a dependency of `scipy` and only the latter would be required. So the expected output of `conda_deps` is a direct translation of the dependencies found in your code.
+
+* The list of conda channels printed out by `conda_deps` is just a recommendation but it is not based on any intelligent inference. Both `bioconda` and `conda-forge` are great channels and follow best practices in the building process, with most of the packages that you might want to install. However, please modify the list manually if needed. It is also possible to add an option to `conda_deps` so the user can specify the desired list of conda channels as input. If you think this would be useful please open an issue.
 
 # Installation
 
