@@ -27,6 +27,7 @@ import re
 import ast
 import argparse
 import bashlex
+import logging
 
 
 # inspired by
