@@ -14,7 +14,7 @@ programs used in cgat-core pipelines.
 It expects to find command-line programs called the CGAT way, i.e.:
 
    statement = """cmd-1 | cmd-2 | cmd-3""""
-   P.run()
+   P.run(statement)
 
 Programs called other way (e.g. using subprocess) will not be picked up
 by this script.
@@ -203,7 +203,12 @@ def get_cmd_names(tree, commands):
 
 def scan_cgatcore_deps(filename):
     '''
-       Auxiliary function to get third-party command-line programs
+       Auxiliary function to get third-party command-line programs used in cgatcore.
+
+       It expects to find command-line programs called the CGAT way, i.e.:
+
+           statement = """cmd-1 | cmd-2 | cmd-3""""
+           P.run(statement)
     '''
 
     # check existence of pipeline script
