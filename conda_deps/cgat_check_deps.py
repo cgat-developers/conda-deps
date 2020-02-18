@@ -29,6 +29,11 @@ import argparse
 import bashlex
 import logging
 
+# ways in which cgatcore name P.run(things)
+CMD_OPTS = {'statement',
+            'executable',
+            'executable_name',
+            'cmd'}
 
 # inspired by
 # https://docs.python.org/3/library/ast.html#module-ast
@@ -38,60 +43,18 @@ import logging
 # https://github.com/titusjan/astviewer
 def is_cgat_statement(node):
     '''
-       Auxiliary function to check for cgat statement:
-           statement = "command"
+        Auxiliary function to check for cgatcore P.run(things):
+        Option 1) statement = "command"
+        Option 2) executable = "command"
+        Option 3) executable_name "command"
+        Option 4) cmd = "command"
     '''
 
     result = False
     result = type(node) is ast.Assign and \
         hasattr(node, 'targets') and \
         hasattr(node.targets[0], 'id') and \
-        node.targets[0].id == "statement"
-
-    return result
-
-
-def is_cgat_executable(node):
-    '''
-       Auxiliary function to check for cgat statement:
-           executable = "command"
-    '''
-
-    result = False
-    result = type(node) is ast.Assign and \
-        hasattr(node, 'targets') and \
-        hasattr(node.targets[0], 'id') and \
-        node.targets[0].id == "executable"
-
-    return result
-
-
-def is_cgat_executable_name(node):
-    '''
-       Auxiliary function to check for cgat statement:
-           executable_name = "command"
-    '''
-
-    result = False
-    result = type(node) is ast.Assign and \
-        hasattr(node, 'targets') and \
-        hasattr(node.targets[0], 'id') and \
-        node.targets[0].id == "executable_name"
-
-    return result
-
-
-def is_cgat_cmd(node):
-    '''
-       Auxiliary function to check for cgat statement:
-           cmd = "command"
-    '''
-
-    result = False
-    result = type(node) is ast.Assign and \
-        hasattr(node, 'targets') and \
-        hasattr(node.targets[0], 'id') and \
-        node.targets[0].id == "cmd"
+        node.targets[0].id in CMD_OPTS
 
     return result
 
@@ -234,10 +197,7 @@ def scan_cgatcore_deps(filename):
     # https://github.com/titusjan/astviewer
     for node in ast.walk(tree):
         statement = ""
-        if is_cgat_statement(node) or \
-           is_cgat_executable(node) or \
-           is_cgat_executable_name(node) or \
-           is_cgat_cmd(node):
+        if is_cgat_statement(node):
 
             statement = get_cmd_string(node)
 
