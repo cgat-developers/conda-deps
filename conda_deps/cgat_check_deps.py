@@ -257,7 +257,7 @@ def scan_cgatcore_deps(filename):
             parts = bashlex.parse(statement)
             get_cmd_names(parts[0], commands)
         except bashlex.errors.ParsingError:
-            logging.warning("Could not parse file: {}".format(filename))
+            logging.warning("scan_cgatcore_deps; could not parse file: {}".format(filename))
 
         for command in commands:
             #print(command)

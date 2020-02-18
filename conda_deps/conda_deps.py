@@ -222,7 +222,7 @@ def scan_python_imports(filename):
                             logging.debug('Ignoring Python dependency: {}'.format(orig))
 
     except BaseException:
-        logging.warning("Could not parse file: {}".format(filename))
+        logging.warning("scan_python_imports; could not parse file: {}".format(filename))
 
     return deps
 
@@ -263,7 +263,7 @@ def scan_jupyter_imports(filename):
                             logging.debug('Ignoring Python dependency: {}'.format(orig))
 
     except BaseException:
-        logging.warning("Could not parse file: {}".format(filename))
+        logging.warning("scan_jupyter_imports; could not parse file: {}".format(filename))
 
     return deps
 
