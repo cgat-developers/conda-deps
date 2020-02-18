@@ -21,7 +21,7 @@ import json
 import logging
 import nbformat
 from nbconvert import PythonExporter
-from conda_deps.cgat_check_deps import scanCgatDeps
+from conda_deps.cgat_check_deps import scan_cgatcore_deps
 
 # modules part of the Python Standard Library
 PY_STD = {'sys',
@@ -470,7 +470,7 @@ def check_deps(filename, exclude_folder):
         python_deps.update(scan_jupyter_magics(f))
 
     for f in scan_cgat:
-        (deps_cgat, deps_cgat_unknown) = translate_misc_deps(scanCgatDeps(f))
+        (deps_cgat, deps_cgat_unknown) = translate_misc_deps(scan_cgatcore_deps(f))
         cgat_deps.update(deps_cgat)
         cgat_unknown.update(deps_cgat_unknown)
 

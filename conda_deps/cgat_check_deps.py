@@ -201,7 +201,7 @@ def get_cmd_names(tree, commands):
                 get_cmd_names(e, commands)
 
 
-def scanCgatDeps(filename):
+def scan_cgatcore_deps(filename):
     '''
        Auxiliary function to get third-party command-line programs
     '''
