@@ -63,6 +63,7 @@ def is_cgat_statement(node):
     bash_statement = ""
 
     if type(node) is ast.Assign:
+        # statement = "command"
         result = hasattr(node, 'targets') and \
             hasattr(node.targets[0], 'id') and \
             node.targets[0].id in CMD_OPTS
@@ -78,46 +79,29 @@ def is_cgat_statement(node):
                     hasattr(node.value.func.value, 's'):
                 bash_statement = node.value.func.value.s
 
+    elif type(node) is ast.Expr:
+        # statement.append("command")
+        result = hasattr(node, 'value') and \
+            hasattr(node.value, 'func') and \
+            hasattr(node.value.func, 'value') and \
+            hasattr(node.value.func.value, 'id') and \
+            node.value.func.value.id == "statement" and \
+            hasattr(node.value.func, 'attr') and \
+            node.value.func.attr == "append"
+
+        if result:
+            bash_statement = ""
+            if hasattr(node, 'value') and \
+               hasattr(node.value, 'args') and \
+               hasattr(node.value.args[0], 's'):
+                bash_statement = node.value.args[0].s
+            elif hasattr(node, 'value') and \
+                    hasattr(node.value, 'args') and \
+                    hasattr(node.value.args[0], 'left') and \
+                    hasattr(node.value.args[0].left, 's'):
+                bash_statement = node.value.args[0].left.s
+
     return result, bash_statement
-
-
-def is_cgat_append(node):
-    '''
-       Auxiliary function to check for cgat statement:
-           statment.append("command")
-    '''
-
-    result = False
-    result = type(node) is ast.Expr and \
-        hasattr(node, 'value') and \
-        hasattr(node.value, 'func') and \
-        hasattr(node.value.func, 'value') and \
-        hasattr(node.value.func.value, 'id') and \
-        node.value.func.value.id == "statement" and \
-        hasattr(node.value.func, 'attr') and \
-        node.value.func.attr == "append"
-
-    return result
-
-
-def get_append_string(node):
-    '''
-       Auxiliary function to get commands in the cgat statement:
-           statement.append("command")
-    '''
-
-    result = ""
-    if hasattr(node, 'value') and \
-       hasattr(node.value, 'args') and \
-       hasattr(node.value.args[0], 's'):
-        result = node.value.args[0].s
-    elif hasattr(node, 'value') and \
-            hasattr(node.value, 'args') and \
-            hasattr(node.value.args[0], 'left') and \
-            hasattr(node.value.args[0].left, 's'):
-        result = node.value.args[0].left.s
-
-    return result
 
 
 def cleanup_statement(statement):
