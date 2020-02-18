@@ -44,19 +44,41 @@ CMD_OPTS = {'statement',
 def is_cgat_statement(node):
     '''
         Auxiliary function to check for cgatcore P.run(things):
-        Option 1) statement = "command"
-        Option 2) executable = "command"
-        Option 3) executable_name "command"
-        Option 4) cmd = "command"
+            Option 1) statement = "command"
+            Option 2) executable = "command"
+            Option 3) executable_name "command"
+            Option 4) cmd = "command"
+
+        Parameters:
+            node: AST node
+
+        Returns:
+            result (boolean): whether it is a cgatcore statement or not
+            bash_statement (string): if yes, it contains the bash statement
+
     '''
 
+    # initialize outputs
     result = False
-    result = type(node) is ast.Assign and \
-        hasattr(node, 'targets') and \
-        hasattr(node.targets[0], 'id') and \
-        node.targets[0].id in CMD_OPTS
+    bash_statement = ""
 
-    return result
+    if type(node) is ast.Assign:
+        result = hasattr(node, 'targets') and \
+            hasattr(node.targets[0], 'id') and \
+            node.targets[0].id in CMD_OPTS
+
+        if result:
+            bash_statement = ""
+            if hasattr(node.value, 's'):
+                bash_statement = node.value.s
+            elif hasattr(node.value, 'left') and hasattr(node.value.left, 's'):
+                bash_statement = node.value.left.s
+            elif hasattr(node.value, 'func') and \
+                    hasattr(node.value.func, 'value') and \
+                    hasattr(node.value.func.value, 's'):
+                bash_statement = node.value.func.value.s
+
+    return result, bash_statement
 
 
 def is_cgat_append(node):
@@ -74,25 +96,6 @@ def is_cgat_append(node):
         node.value.func.value.id == "statement" and \
         hasattr(node.value.func, 'attr') and \
         node.value.func.attr == "append"
-
-    return result
-
-
-def get_cmd_string(node):
-    '''
-       Auxiliary function to get commands in the cgat statement:
-           statement = "command"
-    '''
-    
-    result = ""
-    if hasattr(node.value, 's'):
-        result = node.value.s
-    elif hasattr(node.value, 'left') and hasattr(node.value.left, 's'):
-        result = node.value.left.s
-    elif hasattr(node.value, 'func') and \
-            hasattr(node.value.func, 'value') and \
-            hasattr(node.value.func.value, 's'):
-        result = node.value.func.value.s
 
     return result
 
@@ -196,15 +199,10 @@ def scan_cgatcore_deps(filename):
     # really helpful, used astviewer (installed in a conda-env) to inspect examples
     # https://github.com/titusjan/astviewer
     for node in ast.walk(tree):
-        statement = ""
-        if is_cgat_statement(node):
 
-            statement = get_cmd_string(node)
+        result, statement = is_cgat_statement(node)
 
-        elif is_cgat_append(node):
-            statement = get_append_string(node)
-
-        if len(statement) > 0 and not statement.startswith(' -'):
+        if len(statement) > 0:
             #print(statement)
             statement = cleanup_statement(statement)
             statements.append(statement)
