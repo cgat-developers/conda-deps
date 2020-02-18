@@ -202,7 +202,7 @@ def scan_cgatcore_deps(filename):
 
         result, statement = is_cgat_statement(node)
 
-        if len(statement) > 0:
+        if result:
             #print(statement)
             statement = cleanup_statement(statement)
             statements.append(statement)
