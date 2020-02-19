@@ -387,12 +387,12 @@ def translate_misc_deps(input_deps):
     for k in input_deps:
         tran = MISC_DEPS.get(k, "n/a")
         if tran == 'n/a':
-            logging.debug(' Misc dep: {} is unknown and has been ignored'.format(k))
+            logging.debug('Misc dep: {} is unknown and has been ignored'.format(k))
             unknown.add(k)
         elif tran == 'ignore':
-            logging.debug(' Misc dep: {} has been ignored'.format(k))
+            logging.debug('Misc dep: {} has been ignored'.format(k))
         else:
-            logging.debug(' Misc dep: {} translated into: {}'.format(k, tran))
+            logging.debug('Misc dep: {} translated into: {}'.format(k, tran))
             result.add(tran)
 
     return result, unknown
