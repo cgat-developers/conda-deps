@@ -60,7 +60,7 @@ def is_cgat_statement(node):
 
     # initialize outputs
     result = False
-    bash_statement = ""
+    bash_statement = None
 
     if type(node) is ast.Assign:
         # statement = "command"
@@ -69,15 +69,17 @@ def is_cgat_statement(node):
             node.targets[0].id in CMD_OPTS
 
         if result:
-            bash_statement = ""
             if hasattr(node.value, 's'):
                 bash_statement = node.value.s
             elif hasattr(node.value, 'left') and hasattr(node.value.left, 's'):
                 bash_statement = node.value.left.s
             elif hasattr(node.value, 'func') and \
                     hasattr(node.value.func, 'value') and \
-                    hasattr(node.value.func.value, 's'):
+                    hasattr(node.value.func.value, 's') and \
+                    len(node.value.func.value.s) > 1:
                 bash_statement = node.value.func.value.s
+
+            logging.debug('is_cgat_statement - assign; statement: {}'.format(bash_statement))
 
     elif type(node) is ast.Expr:
         # statement.append("command")
@@ -90,7 +92,6 @@ def is_cgat_statement(node):
             node.value.func.attr == "append"
 
         if result:
-            bash_statement = ""
             if hasattr(node, 'value') and \
                hasattr(node.value, 'args') and \
                hasattr(node.value.args[0], 's'):
@@ -101,7 +102,9 @@ def is_cgat_statement(node):
                     hasattr(node.value.args[0].left, 's'):
                 bash_statement = node.value.args[0].left.s
 
-    return result, bash_statement
+            logging.debug('is_cgat_statement - expr; statement: {}'.format(bash_statement))
+
+    return bash_statement
 
 
 def cleanup_statement(statement):
@@ -184,22 +187,22 @@ def scan_cgatcore_deps(filename):
     # https://github.com/titusjan/astviewer
     for node in ast.walk(tree):
 
-        result, statement = is_cgat_statement(node)
+        statement = is_cgat_statement(node)
 
-        if result:
-            #print(statement)
+        if statement is not None:
             statement = cleanup_statement(statement)
             statements.append(statement)
+            logging.debug("scan_cgatcore_deps; statement to process: {}".format(statement))
 
     for statement in statements:
         # use bashlex to parse statements
         commands = []
         try:
-            #print(statement)
             parts = bashlex.parse(statement)
             get_cmd_names(parts[0], commands)
         except bashlex.errors.ParsingError:
             logging.warning("scan_cgatcore_deps; could not parse file: {}".format(filename))
+            logging.warning("scan_cgatcore_deps; failing statement: {}".format(statement))
 
         for command in commands:
             #print(command)
